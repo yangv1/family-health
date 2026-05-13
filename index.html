@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>家族健康檔案庫</title>
+<style>
+:root{--bg:#F7F4EF;--bg2:#EDEAE3;--ink:#1C1B18;--ink2:#5A5750;--ink3:#9A9690;--accent:#C4552A;--green:#3A7D5C;--blue:#2E5FA3;--purple:#7B5EA7;--card:#FFFFFF;--border:#D8D4CC;--r:12px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,"Noto Sans TC",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:15px}
+header{background:var(--card);border-bottom:1px solid var(--border);padding:0 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;height:52px;gap:10px}
+#hBack{display:none;background:none;border:none;color:var(--accent);font-size:15px;cursor:pointer;padding:4px 0;white-space:nowrap;font-family:inherit}
+#hBack.on{display:flex;align-items:center;gap:3px}
+#hTitle{font-size:16px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:default;user-select:none}
+#adminBtn{background:none;border:none;cursor:pointer;font-size:18px;padding:4px;opacity:0.4;transition:opacity .2s}
+#adminBtn:hover{opacity:1}
+.pg{display:none;padding-bottom:80px}.pg.on{display:block}
+
+/* HOME */
+#home{padding:20px 16px 80px}
+.greeting h1{font-size:24px;font-weight:300;line-height:1.3;margin-bottom:4px}
+.greeting p{font-size:12px;color:var(--ink3);margin-bottom:20px}
+.alert-box{background:#FEF3EC;border:1px solid #F0C4A8;border-radius:var(--r);padding:12px 14px;margin-bottom:20px}
+.alert-box h3{font-size:12px;color:var(--accent);font-weight:600;margin-bottom:6px}
+.ai{font-size:12px;color:var(--ink2);padding:2px 0 2px 12px;position:relative;line-height:1.4}
+.ai::before{content:'•';position:absolute;left:0;color:var(--accent)}
+.st{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;position:relative;overflow:hidden;transition:opacity .2s}
+.mc:active{opacity:.85}
+.mc.hidden-member{opacity:.5;border-style:dashed}
+.mc-badge{position:absolute;top:10px;right:10px;background:var(--accent);color:#fff;font-size:9px;font-weight:600;padding:2px 5px;border-radius:10px}
+.mc-hidden-badge{position:absolute;top:10px;right:10px;background:var(--ink3);color:#fff;font-size:9px;font-weight:600;padding:2px 5px;border-radius:10px}
+.mc-av{width:36px;height:36px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:8px}
+.mc-name{font-size:15px;font-weight:600}
+.mc-id{font-size:11px;color:var(--ink3);margin-top:1px}
+.mc-stats{display:flex;gap:6px;margin-top:8px}
+.stat{font-size:10px;color:var(--ink3);background:var(--bg);padding:2px 7px;border-radius:20px}
+.stat b{color:var(--ink2)}
+.toggle-vis{position:absolute;bottom:10px;right:10px;background:none;border:1px solid var(--border);border-radius:6px;font-size:10px;padding:2px 6px;cursor:pointer;color:var(--ink3);font-family:inherit;display:none}
+.admin-mode .toggle-vis{display:block}
+.admin-mode .mc{cursor:default}
+.admin-mode .mc.clickable{cursor:pointer}
+
+/* ADMIN PANEL */
+#adminBar{display:none;background:#1C1B18;color:#fff;padding:10px 16px;font-size:13px;align-items:center;gap:10px;position:sticky;top:52px;z-index:90}
+#adminBar.on{display:flex}
+#adminBar span{flex:1}
+#exitAdminBtn{background:none;border:1px solid rgba(255,255,255,.3);color:#fff;font-size:12px;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center}
+.overlay.on{display:flex}
+.modal{background:var(--card);border-radius:16px;padding:24px 20px;width:calc(100% - 48px);max-width:320px}
+.modal h3{font-size:16px;font-weight:700;margin-bottom:6px}
+.modal p{font-size:13px;color:var(--ink2);margin-bottom:16px}
+.modal input{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:20px;letter-spacing:.3em;text-align:center;font-family:inherit;outline:none;transition:border-color .15s}
+.modal input:focus{border-color:var(--accent)}
+.modal input.err{border-color:#C42A2A;animation:shake .3s}
+.modal-btns{display:flex;gap:8px;margin-top:16px}
+.btn{flex:1;padding:10px;border-radius:8px;font-size:14px;cursor:pointer;font-family:inherit;border:1px solid var(--border);background:var(--card);color:var(--ink)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* MEMBER */
+.hero{background:var(--card);border-bottom:1px solid var(--border);padding:16px}
+.hero-top{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.hero-av{width:52px;height:52px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:26px}
+.hero-name{font-size:20px;font-weight:700}
+.hero-id{font-size:12px;color:var(--ink3);margin-top:2px}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:11px;padding:2px 8px;border-radius:20px;border:1px solid var(--border);color:var(--ink2);background:var(--bg)}
+.tag.r{border-color:#F0C4A8;background:#FEF3EC;color:var(--accent)}
+.tag.a{border-color:#F9D6D6;background:#FEF0F0;color:#C42A2A}
+.tabs{display:flex;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:52px;z-index:50}
+.tab{flex:1;padding:13px 0;background:none;border:none;font-size:13px;color:var(--ink3);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;transition:all .15s}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.tc{display:none;padding:16px}.tc.on{display:block}
+
+/* TIMELINE */
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.fb{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--ink2);cursor:pointer;font-family:inherit}
+.fb.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tl-yr{font-size:11px;color:var(--ink3);padding:12px 0 6px;letter-spacing:.04em}
+.ti{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--bg2);cursor:pointer}
+.ti:last-child{border-bottom:none}
+.ti:active{background:var(--bg2);border-radius:8px;margin:0 -4px;padding-left:4px;padding-right:4px}
+.ti-l{width:38px;flex-shrink:0;display:flex;flex-direction:column;align-items:center}
+.ti-d{font-size:10px;color:var(--ink3);text-align:center;line-height:1.3}
+.ti-dot{width:9px;height:9px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.ti-line{width:1px;background:var(--border);flex:1;margin-top:4px}
+.ti-r{flex:1}
+.ti-type{font-size:11px;font-weight:600;margin-bottom:2px;display:flex;align-items:center;gap:5px}
+.ti-pend{background:var(--accent);color:#fff;font-size:9px;padding:1px 4px;border-radius:3px}
+.ti-title{font-size:13px;font-weight:500;line-height:1.4}
+.ti-desc{font-size:11px;color:var(--ink3);margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.c看診紀錄{color:var(--blue)}.d看診紀錄{background:var(--blue)}
+.c用藥變化{color:var(--green)}.d用藥變化{background:var(--green)}
+.c檢查結果{color:var(--purple)}.d檢查結果{background:var(--purple)}
+.c症狀觀察{color:#A07B1A}.d症狀觀察{background:#E8B84B}
+
+/* MEDS */
+.med-list{display:flex;flex-direction:column;gap:7px;margin-bottom:20px}
+.med{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:11px 13px;display:flex;align-items:center;gap:10px}
+.med-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
+.med-dot.off{background:var(--ink3)}
+.med-name{font-size:13px;font-weight:500;flex:1}
+.med-dose{font-size:11px;color:var(--ink3)}
+.med-sub{font-size:11px;color:var(--ink3);margin-top:1px}
+
+/* GUIDE */
+.guide-list{display:flex;flex-direction:column;gap:8px}
+.guide{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:12px 14px}
+.guide-top{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.g-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.guide-title{font-size:13px;font-weight:500;flex:1}
+.imp{font-size:10px;padding:2px 6px;border-radius:10px}
+.imp高{background:#FEF3EC;color:var(--accent)}.imp中{background:#FEF9EC;color:#A07B1A}.imp低{background:var(--bg2);color:var(--ink3)}
+.guide-meta{font-size:11px;color:var(--ink3);display:flex;flex-wrap:wrap;gap:8px}
+
+/* EVENT */
+#event-pg{padding:16px 16px 80px}
+.ev-head{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:12px}
+.ev-type{font-size:12px;font-weight:600;margin-bottom:6px}
+.ev-title{font-size:19px;font-weight:700;line-height:1.3;margin-bottom:8px}
+.ev-date{font-size:12px;color:var(--ink3)}
+.ev-pend{display:inline-flex;align-items:center;gap:5px;background:#FEF3EC;color:var(--accent);border:1px solid #F0C4A8;font-size:12px;padding:5px 10px;border-radius:7px;margin-top:10px}
+.ev-sec{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px}
+.ev-lbl{font-size:10px;color:var(--ink3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
+.ev-val{font-size:13px;line-height:1.65;white-space:pre-wrap}
+
+/* PENDING */
+#pending-pg{padding:16px 16px 80px}
+.pend-item{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r);padding:13px 14px;margin-bottom:10px;cursor:pointer}
+.pend-item:active{opacity:.8}
+.pend-name{font-size:11px;color:var(--accent);font-weight:600;margin-bottom:3px}
+.pend-title{font-size:14px;font-weight:500;margin-bottom:4px}
+.pend-note{font-size:12px;color:var(--ink3)}
+.empty{text-align:center;padding:36px 16px;color:var(--ink3);font-size:13px}
+
+/* NAV */
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:100}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px 0;background:none;border:none;cursor:pointer;gap:2px;color:var(--ink3);font-size:10px;font-family:inherit}
+.nb.on{color:var(--accent)}
+.nb span:first-child{font-size:20px}
+</style>
+</head>
+<body>
+
+<header>
+  <button id="hBack" onclick="goBack()">← 返回</button>
+  <div id="hTitle" >🏥 家族健康檔案庫</div>
+  <button id="adminBtn" onclick="openAdminLogin()" title="管理員">⚙️</button>
+</header>
+
+<div id="adminBar">
+  <span>⚙️ 管理員模式　點卡片上的按鈕切換可見性</span>
+  <button id="exitAdminBtn" onclick="exitAdmin()">離開</button>
+</div>
+
+<!-- Login Modal -->
+<div class="overlay" id="loginOverlay">
+  <div class="modal">
+    <h3>🔐 管理員登入</h3>
+    <p>請輸入管理員密碼</p>
+    <input type="password" id="pwInput" maxlength="8" placeholder="••••" oninput="onPwInput()" onkeydown="if(event.key==='Enter')checkPw()">
+    <div class="modal-btns">
+      <button class="btn" onclick="closeLogin()">取消</button>
+      <button class="btn primary" onclick="checkPw()">確認</button>
+    </div>
+  </div>
+</div>
+
+<div class="pg on" id="home">
+  <div class="greeting"><h1>家族健康<br>檔案庫</h1><p id="today"></p></div>
+  <div class="alert-box" id="alertBox" style="display:none">
+    <h3>⚠️ 待追蹤事項</h3><div id="alertList"></div>
+  </div>
+  <div class="st">家族成員</div>
+  <div class="grid" id="memberGrid"></div>
+</div>
+
+<div class="pg" id="member-pg">
+  <div class="hero">
+    <div class="hero-top">
+      <div class="hero-av" id="hAv"></div>
+      <div><div class="hero-name" id="hName"></div><div class="hero-id" id="hId"></div></div>
+    </div>
+    <div class="tags" id="hTags"></div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" onclick="swTab('tl',this)">事件紀錄</button>
+    <button class="tab" onclick="swTab('med',this)">用藥清單</button>
+    <button class="tab" onclick="swTab('guide',this)">照顧指南</button>
+  </div>
+  <div class="tc on" id="tc-tl">
+    <div class="filters">
+      <button class="fb on" onclick="filterTL('全部',this)">全部</button>
+      <button class="fb" onclick="filterTL('看診紀錄',this)">看診</button>
+      <button class="fb" onclick="filterTL('用藥變化',this)">用藥</button>
+      <button class="fb" onclick="filterTL('檢查結果',this)">檢查</button>
+      <button class="fb" onclick="filterTL('症狀觀察',this)">症狀</button>
+    </div>
+    <div id="tlItems"></div>
+  </div>
+  <div class="tc" id="tc-med">
+    <div class="st">目前服用中</div><div class="med-list" id="medCur"></div>
+    <div class="st">已停藥／歷史</div><div class="med-list" id="medOld"></div>
+  </div>
+  <div class="tc" id="tc-guide"><div class="guide-list" id="guideList"></div></div>
+</div>
+
+<div class="pg" id="event-pg">
+  <div class="ev-head">
+    <div class="ev-type" id="evType"></div>
+    <div class="ev-title" id="evTitle"></div>
+    <div class="ev-date" id="evDate"></div>
+    <div class="ev-pend" id="evPend" style="display:none">⚠️ 待追蹤</div>
+  </div>
+  <div id="evSecs"></div>
+</div>
+
+<div class="pg" id="pending-pg">
+  <div class="st" style="padding:16px 16px 0">所有待追蹤事項</div>
+  <div style="padding:8px 16px 0" id="pendList"></div>
+</div>
+
+<nav id="nav">
+  <button class="nb on" onclick="showHome()"><span>🏠</span><span>首頁</span></button>
+  <button class="nb" onclick="showPend()"><span>⚠️</span><span>待追蹤</span></button>
+</nav>
+
+<script>
+// ── CONFIG ──
+const ADMIN_PW = '4982';
+const DEFAULT_VISIBLE = ['M01','M02','M03','M04','M05'];
+
+// ── DATA ──
+const D={
+  members:[
+    {id:"M01",name:"爸",av:"👴",chronic:[],allergy:"",blood:"",eIds:["e-d1","e-d2","e-d3","e-d4","e-d5","e-d6","e-d7","e-d8","e-d9"],mIds:["m-d1","m-d2"],gIds:["g-d1","g-d2","g-d3","g-d4"]},
+    {id:"M02",name:"媽",av:"👩",chronic:[],allergy:"",blood:"",eIds:["e-m1","e-m2","e-m3","e-m4","e-m5","e-m6","e-m7","e-m8","e-m9","e-m10","e-m11","e-m12","e-m13","e-m14","e-m15","e-m16"],mIds:["m-m1","m-m2","m-m3","m-m4","m-m5","m-m6"],gIds:["g-m1"]},
+    {id:"M03",name:"大姐",av:"👱‍♀️",chronic:[],allergy:"",blood:"",eIds:["e-s1"],mIds:[],gIds:[]},
+    {id:"M04",name:"二姐",av:"🧑‍🦱",chronic:[],allergy:"",blood:"",eIds:[],mIds:[],gIds:[]},
+    {id:"M05",name:"YV",av:"👤",chronic:[],allergy:"",blood:"",eIds:["e-y1","e-y2","e-y3","e-y4","e-y5","e-y6","e-y7","e-y8"],mIds:[],gIds:[]},
+    {id:"M06",name:"草菇",av:"🍄",chronic:[],allergy:"",blood:"",eIds:[],mIds:[],gIds:[]},
+    {id:"M07",name:"餔幾",av:"🧸",chronic:[],allergy:"",blood:"",eIds:[],mIds:[],gIds:[]},
+  ],
+  events:{
+    "e-d1":{title:"爸 - 胸腔外科回診追蹤",type:"看診紀錄",date:"",desc:"奇美 胸腔外科謝俊民，半年回診追蹤X光",diag:"胸腔追蹤，半年回診照X光",med:"",pending:false,note:"",src:"口頭得知"},
+    "e-d2":{title:"爸 - B肝追蹤",type:"看診紀錄",date:"",desc:"德欣診所，半年一次抽血+超音波",diag:"B肝定期追蹤，半年抽血+超音波",med:"",pending:false,note:"",src:"口頭得知"},
+    "e-d3":{title:"爸 - 右眼白內障手術",type:"看診紀錄",date:"2025-11-26",desc:"慶明眼科。手術方式：飛秒(50000)。水晶體：延焦段+非球面+散光矯正(49256)",diag:"右眼白內障手術完成",med:"",pending:false,note:"",src:"正式就診"},
+    "e-d4":{title:"爸 - 左眼白內障手術",type:"看診紀錄",date:"2026-01-06",desc:"慶明眼科。手術方式：飛秒(50000)。水晶體：延焦段+非球面(無散光矯正)",diag:"左眼白內障手術完成",med:"",pending:false,note:"",src:"正式就診"},
+    "e-d5":{title:"爸 - 高血壓用藥換藥",type:"用藥變化",date:"2026-04-15",desc:"協和家醫 侯醫師，高血壓用藥調整",diag:"持續服用中",med:"2026/4/14前：得安穩80mg → 2026/4/15起改：汎穩壓160mg",pending:false,note:"",src:"口頭得知"},
+    "e-d6":{title:"爸 - 家庭健康檢查（奇美）",type:"檢查結果",date:"2023-10-16",desc:"奇美醫院健檢，方案：顧腸護胃24000+頸動脈超音波3000。開立泰克胃通（睡前和早上空腹）一個月。",diag:"糜爛性食道炎/黏膜破損、良性胃息肉、大腸0.3cm息肉。建議少喝酒，約兩年門診追蹤。",med:"泰克胃通（睡前+早上空腹）一個月",pending:false,note:"",src:"正式就診"},
+    "e-d7":{title:"爸 - 白內障手術前諮詢筆記",type:"看診紀錄",date:"2025-11-01",desc:"慶明眼科 范小姐諮詢。三焦點夜間易眩光不適合（爸有夜間開車）。選延焦段（70cm以外清楚）。短距看手機報紙需戴老花眼鏡。術後視力接近0度。術後青光眼藥水仍要繼續點，換水晶體有助青光眼防護。",diag:"選延焦段水晶體（RAO210T Rayner），右眼附加散光矯正",med:"",pending:false,note:"",src:"口頭得知"},
+    "e-d8":{title:"爸 - 右眼白內障（水晶體規格補充）",type:"看診紀錄",date:"2025-11-26",desc:"慶明眼科。水晶體規格：Rayner RAO210T，Sph +18.50D，LOT 0352-03-04，SN 42。手術方式：飛秒（完成）。",diag:"水晶體：Rayner RAO210T Sph +18.50D，延焦段+非球面+散光矯正，英國製造",med:"",pending:false,note:"",src:"正式就診"},
+    "e-d9":{title:"爸 - 胸腔外科回診（2026/8/20）",type:"看診紀錄",date:"2026-08-20",desc:"奇美醫院 胸腔內科二診 謝俊民醫師。看診號4號。先開 X-ray。地點：46診間（第一醫療大樓2F）。",diag:"待補（尚未就診）",med:"",pending:true,note:"2026/8/20 預約回診，記得先開 X-ray",src:"口頭得知"},
+    "e-m1":{title:"媽 - 身心科初診（春霖診所）",type:"看診紀錄",date:"2022-06-22",desc:"春霖診所 蘇春霖醫師。自律神經失調。早：NICAMET(50)×1、TAEE(5)×1、SINLIHAUL(20)×1、THIAMINE 100×1。晚：NICAMET(50)×1、TAEE(5)×1、SINLIHAUL(20)×1、TONE F.C.(10)×1、CLONOPAM(2)×0.5T。共10項/7天",diag:"自律神經失調",med:"早：NICAMET(50)、TAEE(5)、SINLIHAUL(20)、THIAMINE 100各×1。晚：NICAMET(50)、TAEE(5)、SINLIHAUL(20)、TONE F.C.(10)各×1、CLONOPAM(2)×0.5T",pending:false,note:"",src:"正式就診"},
+    "e-m2":{title:"媽 - 身心科用藥調整（1）",type:"用藥變化",date:"2022-06-29",desc:"拿掉晚上TAEE(大益糖衣錠)，改用LARPAM(2)世達樂眠錠。感受：睡眠改善，但有殘尿感，早上起來易不平衡、暈。",diag:"",med:"拿掉晚上 TAEE，改用 LARPAM(2) 樂眠錠",pending:false,note:"",src:"正式就診"},
+    "e-m3":{title:"媽 - 身心科用藥調整（2）",type:"用藥變化",date:"2022-07-13",desc:"拿掉早晚LARPAM(樂眠)，加入YUNGKEN(200)永淨膜衣錠（治療殘尿感）。",diag:"",med:"拿掉早晚 LARPAM，加入 YUNGKEN(200) 永淨膜衣錠治殘尿感",pending:false,note:"",src:"正式就診"},
+    "e-m4":{title:"媽 - 身心科拿藥（樂行）",type:"看診紀錄",date:"2026-04-19",desc:"樂行診所。目前用藥確認。",diag:"",med:"目前用藥：暫安諾、可那品、褪黑激素",pending:false,note:"",src:"正式就診"},
+    "e-m5":{title:"媽 - 家庭健康檢查（奇美）",type:"檢查結果",date:"2023-10-16",desc:"奇美醫院健檢，方案：顧腸護肝29000（扣除子宮頸抹片、乳房攝影）。開立泰克胃通三個月。",diag:"胃淺淺潰瘍、食道有點發炎、良性息肉。大腸：外痔，腸子沒問題。建議少量多餐、不要空腹喝茶。",med:"泰克胃通三個月",pending:false,note:"",src:"正式就診"},
+    "e-m6":{title:"媽 - 風濕免疫科（奇美，擔心乾燥症）",type:"看診紀錄",date:"2026-05-11",desc:"奇美 風濕免疫科 林永章。擔心乾燥症。檢查：全套血液+蟻酸酮+免疫球蛋白G+類風濕性關節炎檢測+修格蘭氏抗體+抗細胞核抗體+頭頸軟組織超音波。下次預約2026/5/18回診。",diag:"待補（抽血+超音波結果尚未出爐）",med:"",pending:true,note:"2026/5/18 回診確認抽血結果",src:"正式就診"},
+    "e-m7":{title:"媽 - 風濕免疫科初診抽血報告",type:"檢查結果",date:"2020-11-26",desc:"成大風濕免疫科 翁孟玉。症狀：左膝蓋外後側/手指關節對稱位置疼痛。抽6管血+X光檢查。",diag:"CREA 0.42(L,偏低), ALT 16(正常), CRP 1.4(正常), RF、C3 84.7、C4 16.9均正常。WBC 5.0, RBC 4.35, Hb 12.9, ESR 4均正常。",med:"希樂葆膠囊 200mg (Celebrex)，消炎止痛",pending:false,note:"",src:"正式就診"},
+    "e-m8":{title:"媽 - 骨科（部立新營，硬脊膜外注射）",type:"看診紀錄",date:"2021-03-15",desc:"部立新營醫院 林慶美醫師。硬脊膜外注射第1次，打完回來非常痠痛，因此取消後續四次神經阻斷術。",diag:"硬脊膜外注射第1次，因疼痛反應強烈取消後續",med:"",pending:false,note:"",src:"正式就診"},
+    "e-m9":{title:"媽 - 骨科初診（吳芳峻診所）",type:"看診紀錄",date:"2021-05-07",desc:"吳芳峻診所。症狀：左腿膝蓋腳踝痠/右屁股痛，不能久坐。左腳是脊椎引起，非膝關節退化症狀。",diag:"左腳症狀為脊椎引起，非膝關節退化",med:"",pending:false,note:"",src:"正式就診"},
+    "e-m10":{title:"媽 - 骨科高頻熱凝療（吳芳峻診所）",type:"看診紀錄",date:"2021-05-17",desc:"吳芳峻診所。自費高頻熱凝療法8500元。",diag:"高頻熱凝療法第1次，左腳神經反應較佳",med:"",pending:false,note:"",src:"正式就診"},
+    "e-m11":{title:"媽 - 骨科消炎止痛注射+藥單（吳芳峻診所）",type:"看診紀錄",date:"2021-05-24",desc:"吳芳峻診所。注射消炎止痛1000元+口服消炎止痛。\nALPRAZOLAM 睡前1片/3天\nACECLOFENAC 早晚飯後1片/11天\nFAMOTIDINE胃藥 早晚飯後1片/11天\nGABAPENTIN 100 睡前1片/11天",diag:"持續治療中，疼痛小幅改善",med:"ALPRAZOLAM 睡前1片3天\nACECLOFENAC 早晚飯後1片11天\nFAMOTIDINE(胃藥) 早晚飯後1片11天\nGABAPENTIN 100 睡前1片11天",pending:false,note:"",src:"正式就診"},
+    "e-m12":{title:"媽 - 骨科回診問診（吳芳峻診所，6/11）",type:"看診紀錄",date:"2021-06-11",desc:"吳芳峻診所回診。左：腿膝蓋腳踝痠/右：屁股痛，有比較好一點點。醫師說左腳是脊椎引起，進步緩慢是正常。上次打完第二次高頻熱凝後全身軟，醫師說是麻藥正常反應。消炎止痛點滴打完都不能睡，醫師說如果很不舒服可以不打。",diag:"左腳脊椎引起，進步緩慢正常，繼續治療",med:"",pending:false,note:"",src:"正式就診"},
+    "e-m13":{title:"媽 - 骨科治療（吳芳峻診所，6/29）",type:"看診紀錄",date:"2021-06-29",desc:"吳芳峻診所。治療，無特殊狀況。",diag:"",med:"",pending:false,note:"",src:"正式就診"},
+    "e-m14":{title:"媽 - 骨科治療（吳芳峻診所，7/27）",type:"看診紀錄",date:"2021-07-27",desc:"吳芳峻診所。治療，無特殊狀況。",diag:"",med:"",pending:false,note:"",src:"正式就診"},
+    "e-m15":{title:"媽 - 骨科最後一次問診（吳芳峻診所，8/31）",type:"看診紀錄",date:"2021-08-31",desc:"吳芳峻診所最後一次問診。治療結束。",diag:"治療結束",med:"",pending:false,note:"",src:"正式就診"},
+    "e-m16":{title:"媽 - 骨科待評估醫師清單",type:"症狀觀察",date:"",desc:"媽脊椎骨科待評估醫師建議清單（別人推薦，尚未就診）：\n• 慈濟大林 小針刀 陳韋任（寶林推薦）\n• 義大院長 杜元坤（寶林推薦，手術權威，吳榮斌同學可特別掛號）\n• 安南醫院 骨科 林瑞模（蔡先生）\n• 安南醫院 神經外科 莊皓宇\n• 奇美醫院 黃柏昌\n• 永康 吳芳峻診所\n• 阮綜合 鄭傑陽（魏妞介紹）\n• 佳里奇美 林思維（廖小姐姐姐）",diag:"",med:"",pending:true,note:"尚未就診，將來如需再就診時可參考此清單",src:"口頭得知"},
+    "e-s1":{title:"大姐 - 家庭健康檢查（奇美）",type:"檢查結果",date:"2023-10-16",desc:"奇美醫院健檢，方案：愛肺25000+腦部核磁共振(含顯影)15000+頸動脈超音波3000+頸部超音波(含甲狀腺及頸部淋巴結)900+大腸鏡含麻醉7250",diag:"結果待補充",med:"",pending:true,note:"健檢項目包含腦部MRI、頸動脈、甲狀腺、大腸鏡，結果尚未記錄",src:"正式就診"},
+    "e-y1":{title:"YV - 家庭健康檢查（奇美）",type:"檢查結果",date:"2023-10-16",desc:"奇美醫院健檢，方案：舒心順頸 22500",diag:"結果待補充",med:"",pending:true,note:"健檢方案為舒心順頸 22500，結果尚未記錄",src:"正式就診"},
+    "e-y2":{title:"YV - 眼科視力檢查",type:"檢查結果",date:"2023-07-20",desc:"視力檢查。右眼：近視450度散光75。左眼：近視475度散光125。",diag:"右眼近視450度散光75、左眼近視475度散光125",med:"",pending:false,note:"",src:"正式就診"},
+    "e-y3":{title:"YV - 凍卵手術（安安婦幼）",type:"看診紀錄",date:"2023-05-17",desc:"台南安安婦幼中心。凍卵手術完成，取卵14顆，共三管（6+6+2）。",diag:"取卵14顆，三管分裝（6+6+2）",med:"",pending:false,note:"",src:"正式就診"},
+    "e-y4":{title:"YV - 懷孕與人工流產",type:"看診紀錄",date:"2022-06-18",desc:"2022/6/18 確認懷孕。胚胎發育至5週後，2022/8/6進行人工流產。",diag:"2022/8/6 人工流產（胚胎5週）",med:"",pending:false,note:"",src:"自行填寫"},
+    "e-y5":{title:"YV - 陰道超音波（安安婦幼）",type:"檢查結果",date:"2022-06-01",desc:"安安婦幼中心。生育力檢測系列之一。",diag:"結果待補充",med:"",pending:false,note:"",src:"正式就診"},
+    "e-y6":{title:"YV - 輸卵管攝影（安安婦幼）",type:"檢查結果",date:"2022-06-11",desc:"安安婦幼中心。輸卵管通暢情形檢查。",diag:"結果待補充",med:"",pending:false,note:"",src:"正式就診"},
+    "e-y7":{title:"YV - 子宮內視鏡（安安婦幼）",type:"檢查結果",date:"2022-06-13",desc:"安安婦幼中心。子宮內視鏡檢查。",diag:"結果待補充",med:"",pending:false,note:"",src:"正式就診"},
+    "e-y8":{title:"YV - 生育力血液檢查（新南海醫事檢驗所）",type:"檢查結果",date:"2022-12-28",desc:"安安婦幼中心，新南海醫事檢驗所。生育力血液檢查。",diag:"Chlamydia IgA <3.0(陰性)、TSH 1.9879 uIU/mL(正常)、AMH 2.51 ng/mL、FSH 5.81 mIU/mL、LH 3.78 mIU/mL、Prolactin 12.92 ng/mL(正常)、Estradiol(E2) 17 pg/mL",med:"",pending:false,note:"",src:"正式就診"},
+  },
+  meds:{
+    "m-d1":{name:"汎穩壓 160mg",dose:"160mg",time:"",status:"服用中",dept:"家醫科",note:"每月到協和家醫 侯醫師拿藥，取代得安穩80mg"},
+    "m-d2":{name:"得安穩 80mg（已換藥）",dose:"80mg",time:"",status:"已停藥",dept:"家醫科",note:"2026/4/15起改用汎穩壓160mg"},
+    "m-m1":{name:"暫安諾",dose:"",time:"",status:"服用中",dept:"身心科",note:"樂行診所處方，2023/7月起就診"},
+    "m-m2":{name:"可那品",dose:"",time:"",status:"服用中",dept:"身心科",note:"樂行診所處方"},
+    "m-m3":{name:"褪黑激素",dose:"",time:"睡前",status:"服用中",dept:"身心科",note:"樂行診所處方，睡前服用"},
+    "m-m4":{name:"NICAMET 50mg（江佳脈）",dose:"50mg 早晚各一片",time:"早、晚",status:"已停藥",dept:"身心科",note:"春霖診所，後因換診所停藥"},
+    "m-m5":{name:"TAEE 5mg（大益糖衣錠）",dose:"5mg",time:"早",status:"已停藥",dept:"身心科",note:"春霖診所，後停藥"},
+    "m-m6":{name:"LARPAM 2mg（樂眠）",dose:"2mg 睡前半片",time:"睡前",status:"已停藥",dept:"身心科",note:"春霖診所，2022/7/13停，改用永淨"},
+  },
+  guide:{
+    "g-d1":{title:"爸 - 胸腔外科（奇美）",dept:"胸腔外科",hospital:"奇美醫院",freq:"半年一次",next:"2026-08-20",imp:"高",note:"謝俊民醫師，記得先開X-ray"},
+    "g-d2":{title:"爸 - B肝追蹤（德欣診所）",dept:"肝臟科",hospital:"德欣診所",freq:"半年一次",next:"",imp:"高",note:"半年一次抽血+超音波"},
+    "g-d3":{title:"爸 - 眼科（慶明）",dept:"眼科",hospital:"慶明眼科",freq:"定期追蹤",next:"",imp:"高",note:"白內障手術後追蹤＋青光眼定期追蹤，陳昌文院長"},
+    "g-d4":{title:"爸 - 高血壓用藥（協和家醫）",dept:"家醫科",hospital:"協和家醫",freq:"每月一次",next:"",imp:"高",note:"侯醫師，每月拿藥汎穩壓160mg"},
+    "g-m1":{title:"媽 - 身心科（樂行診所）",dept:"身心科",hospital:"樂行診所",freq:"定期拿藥",next:"",imp:"高",note:"目前用藥：暫安諾、可那品、褪黑激素"},
+  }
+};
+
+// ── STATE ──
+let cur={member:null,event:null,filter:'全部',tab:'tl'};
+let hist=[];
+let isAdmin=false;
+// 從 localStorage 讀取可見設定，若無則用預設值
+let visibility=JSON.parse(localStorage.getItem('visibility')||'null') ||
+  Object.fromEntries(D.members.map(m=>[m.id, DEFAULT_VISIBLE.includes(m.id)]));
+
+// ── INIT ──
+const dw=['日','一','二','三','四','五','六'],dn=new Date();
+document.getElementById('today').textContent=`${dn.getFullYear()}/${String(dn.getMonth()+1).padStart(2,'0')}/${String(dn.getDate()).padStart(2,'0')} 週${dw[dn.getDay()]}`;
+
+// ── ALERTS ──
+function renderAlerts(){
+  const visibleIds=D.members.filter(m=>visibility[m.id]).map(m=>m.eIds).flat();
+  const pendAll=visibleIds.map(id=>D.events[id]).filter(e=>e?.pending);
+  if(pendAll.length){
+    document.getElementById('alertBox').style.display='block';
+    document.getElementById('alertList').innerHTML=pendAll.slice(0,5).map(e=>`<div class="ai">${e.title}${e.note?'　<span style="color:var(--ink3)">'+e.note.slice(0,28)+'</span>':''}</div>`).join('');
+  } else {
+    document.getElementById('alertBox').style.display='none';
+  }
+}
+
+// ── MEMBER GRID ──
+function renderGrid(){
+  function cntPend(m){return m.eIds.filter(id=>D.events[id]?.pending).length}
+  const showAll=isAdmin;
+  const visible=D.members.filter(m=>showAll||visibility[m.id]);
+
+  document.getElementById('memberGrid').innerHTML=D.members
+    .filter(m=>showAll||visibility[m.id])
+    .map(m=>{
+      const hidden=!visibility[m.id];
+      const pending=cntPend(m);
+      return `<div class="mc ${hidden?'hidden-member':''} ${isAdmin?'':'clickable'}" ${!isAdmin?`onclick="openMember('${m.id}')"`:''}">
+        ${isAdmin
+          ? `<button class="toggle-vis" onclick="toggleVis('${m.id}')">${hidden?'👁 顯示':'🙈 隱藏'}</button>`
+          : (pending>0?`<div class="mc-badge">${pending} 待追</div>`:'')
+        }
+        ${hidden&&isAdmin?`<div class="mc-hidden-badge">隱藏中</div>`:''}
+        <div class="mc-av">${m.av}</div>
+        <div class="mc-name">${m.name}</div>
+        <div class="mc-id">${m.id}</div>
+        <div class="mc-stats">
+          <div class="stat"><b>${m.eIds.length}</b> 事件</div>
+          <div class="stat"><b>${m.mIds.length}</b> 用藥</div>
+        </div>
+      </div>`;
+    }).join('');
+
+  // 管理員模式下也顯示隱藏的成員（但有虛線樣式）
+  if(isAdmin){
+    const hiddenMembers=D.members.filter(m=>!visibility[m.id]);
+    if(hiddenMembers.length&&!document.querySelector('.hidden-member')){
+      // already included above
+    }
+  }
+}
+
+// ── ADMIN ──
+function openAdminLogin(){
+  if(isAdmin){exitAdmin();return;}
+  document.getElementById('pwInput').value='';
+  document.getElementById('pwInput').classList.remove('err');
+  document.getElementById('loginOverlay').classList.add('on');
+  setTimeout(()=>document.getElementById('pwInput').focus(),100);
+}
+function closeLogin(){document.getElementById('loginOverlay').classList.remove('on')}
+function onPwInput(){document.getElementById('pwInput').classList.remove('err')}
+function checkPw(){
+  const pw=document.getElementById('pwInput').value;
+  if(pw===ADMIN_PW){
+    closeLogin();enterAdmin();
+  } else {
+    const inp=document.getElementById('pwInput');
+    inp.classList.add('err');inp.value='';
+    setTimeout(()=>inp.classList.remove('err'),400);
+  }
+}
+function enterAdmin(){
+  isAdmin=true;
+  document.getElementById('adminBar').classList.add('on');
+  document.getElementById('adminBtn').style.opacity='1';
+  document.getElementById('home').classList.add('admin-mode');
+  renderGrid();
+}
+function exitAdmin(){
+  isAdmin=false;
+  document.getElementById('adminBar').classList.remove('on');
+  document.getElementById('adminBtn').style.opacity='0.4';
+  document.getElementById('home').classList.remove('admin-mode');
+  renderGrid();renderAlerts();
+}
+function toggleVis(id){
+  visibility[id]=!visibility[id];
+  localStorage.setItem('visibility',JSON.stringify(visibility));
+  renderGrid();
+}
+
+// ── MEMBER PAGE ──
+function openMember(id){
+  if(isAdmin)return;
+  const m=D.members.find(x=>x.id===id);if(!m)return;
+  cur.member=m;cur.filter='全部';cur.tab='tl';hist.push('home');
+  document.getElementById('hAv').textContent=m.av;
+  document.getElementById('hName').textContent=m.name;
+  document.getElementById('hId').textContent=m.id;
+  const tags=[];
+  if(m.chronic.length)m.chronic.forEach(c=>tags.push(`<span class="tag r">${c}</span>`));
+  if(m.allergy)tags.push(`<span class="tag a">⚠️ 過敏：${m.allergy}</span>`);
+  if(!tags.length)tags.push(`<span class="tag">無特殊病史記錄</span>`);
+  document.getElementById('hTags').innerHTML=tags.join('');
+  renderTL();renderMeds();renderGuide();
+  resetTabs();showPg('member-pg',m.name);
+}
+
+function renderTL(){
+  const m=cur.member;
+  let evs=m.eIds.map(id=>({id,...D.events[id]})).filter(e=>e.title);
+  if(cur.filter!=='全部')evs=evs.filter(e=>e.type===cur.filter);
+  evs.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(!evs.length){document.getElementById('tlItems').innerHTML='<div class="empty">沒有相關紀錄</div>';return;}
+  const by={};
+  evs.forEach(e=>{const y=e.date?e.date.split('-')[0]:'不明';(by[y]||(by[y]=[])).push(e)});
+  let html='';
+  Object.keys(by).sort((a,b)=>b-a).forEach(y=>{
+    html+=`<div class="tl-yr">${y}</div>`;
+    by[y].forEach((e,i)=>{
+      const mm=e.date?e.date.split('-')[1]:'',dd=e.date?e.date.split('-')[2]:'';
+      html+=`<div class="ti" onclick="openEvent('${e.id}')">
+        <div class="ti-l"><div class="ti-d">${mm||'—'}<br>${dd||''}</div><div class="ti-dot d${e.type}"></div>${i<by[y].length-1?'<div class="ti-line"></div>':''}</div>
+        <div class="ti-r"><div class="ti-type c${e.type}">${e.type}${e.pending?'<span class="ti-pend">待追蹤</span>':''}</div><div class="ti-title">${e.title}</div>${e.desc?`<div class="ti-desc">${e.desc}</div>`:''}</div>
+      </div>`;
+    });
+  });
+  document.getElementById('tlItems').innerHTML=html;
+}
+function filterTL(t,btn){cur.filter=t;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderTL()}
+
+function renderMeds(){
+  const m=cur.member,all=m.mIds.map(id=>({id,...D.meds[id]})).filter(x=>x.name);
+  const c=all.filter(x=>x.status==='服用中'),o=all.filter(x=>x.status!=='服用中');
+  const mh=arr=>arr.length?arr.map(x=>`<div class="med"><div class="med-dot ${x.status!=='服用中'?'off':''}"></div><div style="flex:1"><div class="med-name">${x.name}</div><div class="med-sub">${[x.dept,x.time,x.note].filter(Boolean).join(' · ')}</div></div>${x.dose?`<div class="med-dose">${x.dose}</div>`:''}</div>`).join(''):'<div class="empty" style="padding:12px 0">無資料</div>';
+  document.getElementById('medCur').innerHTML=mh(c);
+  document.getElementById('medOld').innerHTML=mh(o);
+}
+
+function renderGuide(){
+  const m=cur.member,items=m.gIds.map(id=>({id,...D.guide[id]})).filter(x=>x.title);
+  if(!items.length){document.getElementById('guideList').innerHTML='<div class="empty">尚無照顧指南</div>';return;}
+  document.getElementById('guideList').innerHTML=items.map(g=>`
+    <div class="guide"><div class="guide-top"><div class="g-dot"></div><div class="guide-title">${g.title}</div>${g.imp?`<span class="imp imp${g.imp}">${g.imp}</span>`:''}</div>
+    <div class="guide-meta">${g.hospital?`<span>🏥 ${g.hospital}</span>`:''} ${g.dept?`<span>${g.dept}</span>`:''} ${g.freq?`<span>🔄 ${g.freq}</span>`:''} ${g.next?`<span>📅 下次 ${g.next.replace(/-/g,'/')}</span>`:''}</div>
+    ${g.note?`<div style="font-size:12px;color:var(--ink2);margin-top:6px">${g.note}</div>`:''}</div>`).join('');
+}
+
+function openEvent(id){
+  const e={id,...D.events[id]};if(!e.title)return;
+  cur.event=e;hist.push('member-pg');
+  document.getElementById('evType').innerHTML=`<span class="c${e.type}">● ${e.type}</span>`;
+  document.getElementById('evTitle').textContent=e.title;
+  document.getElementById('evDate').textContent=e.date?e.date.replace(/-/g,'/'):'日期不明';
+  document.getElementById('evPend').style.display=e.pending?'inline-flex':'none';
+  const secs=[];
+  if(e.desc)secs.push(['主訴 / 描述',e.desc]);
+  if(e.diag)secs.push(['診斷',e.diag]);
+  if(e.med)secs.push(['用藥異動',e.med]);
+  if(e.note)secs.push(['追蹤備註',e.note]);
+  if(e.src)secs.push(['資料來源',e.src]);
+  document.getElementById('evSecs').innerHTML=secs.map(([l,v])=>`<div class="ev-sec"><div class="ev-lbl">${l}</div><div class="ev-val">${v}</div></div>`).join('')||'<div class="ev-sec"><div class="ev-lbl">備註</div><div class="ev-val" style="color:var(--ink3)">無詳細資料</div></div>';
+  showPg('event-pg',e.title.slice(0,16)+(e.title.length>16?'…':''));
+}
+
+function showPend(){
+  const items=[];
+  D.members.filter(m=>visibility[m.id]).forEach(m=>m.eIds.forEach(id=>{const e=D.events[id];if(e?.pending)items.push({member:m.name,id,...e})}));
+  document.getElementById('pendList').innerHTML=items.map(e=>`<div class="pend-item" onclick="openEventFromPend('${e.id}')"><div class="pend-name">${e.member}</div><div class="pend-title">${e.title}</div>${e.note?`<div class="pend-note">${e.note}</div>`:''}</div>`).join('')||'<div class="empty">目前沒有待追蹤事項</div>';
+  hist.push('home');showPg('pending-pg','待追蹤事項');
+  document.querySelectorAll('.nb').forEach((b,i)=>b.classList.toggle('on',i===1));
+}
+
+function openEventFromPend(id){
+  const m=D.members.find(m=>m.eIds.includes(id));if(m)cur.member=m;openEvent(id);
+}
+
+function showPg(id,title){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  const isHome=id==='home';
+  document.getElementById('hTitle').textContent=isHome?'🏥 家族健康檔案庫':title;
+  document.getElementById('hBack').classList.toggle('on',!isHome);
+  document.getElementById('adminBtn').style.display=isHome?'block':'none';
+  document.getElementById('nav').style.display=id==='event-pg'?'none':'flex';
+  if(isHome)document.getElementById('adminBar').classList.toggle('on',isAdmin);
+  else document.getElementById('adminBar').classList.remove('on');
+  window.scrollTo(0,0);
+}
+
+function showHome(){
+  hist=[];showPg('home','');
+  if(isAdmin)document.getElementById('adminBar').classList.add('on');
+  document.querySelectorAll('.nb').forEach((b,i)=>b.classList.toggle('on',i===0));
+}
+
+function goBack(){
+  const prev=hist.pop();
+  if(!prev||prev==='home'){showHome();return;}
+  document.getElementById('nav').style.display='flex';
+  if(isAdmin)document.getElementById('adminBar').classList.add('on');
+  showPg(prev,cur.member?.name||'');
+}
+
+function swTab(tab,btn){
+  cur.tab=tab;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.tc').forEach(c=>c.classList.remove('on'));
+  btn.classList.add('on');document.getElementById('tc-'+tab).classList.add('on');
+}
+
+function resetTabs(){
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',i===0));
+  document.querySelectorAll('.tc').forEach((c,i)=>c.classList.toggle('on',i===0));
+  document.querySelectorAll('.fb').forEach((b,i)=>b.classList.toggle('on',i===0));
+}
+
+// ── START ──
+renderGrid();
+renderAlerts();
+</script>
+</body>
+</html>
