@@ -4,561 +4,525 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>家族健康檔案庫</title>
+
+<!-- ══════════════════════════════════════════════════════
+     字型載入
+══════════════════════════════════════════════════════ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500&family=DM+Serif+Display&display=swap');
+/* ══════════════════════════════════════════════════════
+   CSS 變數（色彩、圓角、陰影）
+   修改主色調只需改這裡
+══════════════════════════════════════════════════════ */
+:root {
+  --bg:           #f7f4ef;
+  --surface:      #ffffff;
+  --surface2:     #f0ece4;
+  --border:       #e2dbd0;
+  --text:         #2c2419;
+  --text-muted:   #7a6e62;
+  --accent:       #7c4f2f;
+  --accent-light: #c8956a;
+  --accent-bg:    #f5ede4;
+  --green:        #3a6b4a;
+  --green-bg:     #e8f2eb;
+  --red:          #a03030;
+  --red-bg:       #f5e8e8;
+  --yellow:       #7a6020;
+  --yellow-bg:    #f5f0dc;
+  --blue:         #2d5a8a;
+  --blue-bg:      #e8f0f8;
+  --shadow:       0 2px 12px rgba(44,36,25,0.08);
+  --shadow-lg:    0 8px 32px rgba(44,36,25,0.12);
+  --radius:       12px;
+}
 
-  :root {
-    --bg: #f7f4ef;
-    --surface: #ffffff;
-    --surface2: #f0ece4;
-    --border: #e2dbd0;
-    --text: #2c2419;
-    --text-muted: #7a6e62;
-    --accent: #7c4f2f;
-    --accent-light: #c8956a;
-    --accent-bg: #f5ede4;
-    --green: #3a6b4a;
-    --green-bg: #e8f2eb;
-    --red: #a03030;
-    --red-bg: #f5e8e8;
-    --yellow: #7a6020;
-    --yellow-bg: #f5f0dc;
-    --blue: #2d5a8a;
-    --blue-bg: #e8f0f8;
-    --shadow: 0 2px 12px rgba(44,36,25,0.08);
-    --shadow-lg: 0 8px 32px rgba(44,36,25,0.12);
-    --radius: 12px;
-  }
+/* ══════════════════════════════════════════════════════
+   全域 Reset & Base
+══════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
 
-  body {
-    font-family: 'Noto Sans TC', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 14px;
-    line-height: 1.6;
-  }
+/* ══════════════════════════════════════════════════════
+   Header
+══════════════════════════════════════════════════════ */
+.header {
+  background: var(--accent);
+  color: white;
+  padding: 16px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 16px rgba(124,79,47,0.25);
+}
+.header-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.header h1 {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.header-sub { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.btn-admin {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Noto Sans TC', sans-serif;
+  transition: background 0.2s;
+}
+.btn-admin:hover { background: rgba(255,255,255,0.25); }
+.admin-badge {
+  background: rgba(255,220,150,0.25);
+  border: 1px solid rgba(255,220,150,0.5);
+  color: #ffe9a0;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  display: none;
+}
 
-  /* ── Header ── */
-  .header {
-    background: var(--accent);
-    color: white;
-    padding: 20px 24px 16px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 16px rgba(124,79,47,0.25);
-  }
-  .header-inner {
-    max-width: 960px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  .header h1 {
-    font-family: 'Noto Serif TC', serif;
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-  }
-  .header-sub { font-size: 11px; opacity: 0.75; margin-top: 2px; }
-  .header-right { display: flex; gap: 8px; align-items: center; }
-  .btn-admin {
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: 'Noto Sans TC', sans-serif;
-  }
-  .btn-admin:hover { background: rgba(255,255,255,0.25); }
-  .admin-badge {
-    background: rgba(255,220,150,0.25);
-    border: 1px solid rgba(255,220,150,0.5);
-    color: #ffe9a0;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    display: none;
-  }
+/* ══════════════════════════════════════════════════════
+   Navigation
+══════════════════════════════════════════════════════ */
+.nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 56px;
+  z-index: 90;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.nav-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  padding: 0 24px;
+}
+.nav-tab {
+  padding: 11px 15px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+  user-select: none;
+}
+.nav-tab:hover { color: var(--accent); }
+.nav-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 500;
+}
 
-  /* ── Nav Tabs ── */
-  .nav {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 64px;
-    z-index: 90;
-    overflow-x: auto;
-  }
-  .nav-inner {
-    max-width: 960px;
-    margin: 0 auto;
-    display: flex;
-    gap: 0;
-    padding: 0 24px;
-  }
-  .nav-tab {
-    padding: 12px 16px;
-    font-size: 13px;
-    color: var(--text-muted);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    white-space: nowrap;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .nav-tab:hover { color: var(--accent); }
-  .nav-tab.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-    font-weight: 500;
-  }
-  .nav-tab .avatar { font-size: 16px; }
+/* ══════════════════════════════════════════════════════
+   Main Container
+══════════════════════════════════════════════════════ */
+.main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+}
 
-  /* ── Main ── */
-  .main {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 24px;
-  }
+/* ══════════════════════════════════════════════════════
+   頁面顯示控制
+══════════════════════════════════════════════════════ */
+.page { display: none; }
+.page.active { display: block; }
 
-  /* ── Dashboard ── */
-  .dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 14px;
-    margin-bottom: 28px;
-  }
-  .member-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 18px 14px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: var(--shadow);
-    position: relative;
-  }
-  .member-card:hover {
-    border-color: var(--accent-light);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-  }
-  .member-card.has-alert { border-color: #e8a042; }
-  .member-avatar { font-size: 36px; margin-bottom: 8px; }
-  .member-name { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
-  .member-id { font-size: 11px; color: var(--text-muted); }
-  .alert-dot {
-    position: absolute;
-    top: 10px; right: 10px;
-    width: 8px; height: 8px;
-    background: #e8a042;
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%,100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(1.3); }
-  }
+/* ══════════════════════════════════════════════════════
+   管理員面板（登入後顯示）
+══════════════════════════════════════════════════════ */
+.admin-panel {
+  display: none;
+  background: #2c2419;
+  color: #e8dfd0;
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  font-size: 12px;
+}
+.admin-panel h3 { color: #c8956a; font-size: 13px; margin-bottom: 10px; }
+.admin-panel-desc { color: #a89880; margin-bottom: 10px; }
+.visibility-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+.vis-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 5px 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: background 0.2s;
+}
+.vis-item:hover { background: rgba(255,255,255,0.1); }
 
-  /* ── Alert Banner ── */
-  .alert-section {
-    background: var(--yellow-bg);
-    border: 1px solid #d4b860;
-    border-radius: var(--radius);
-    padding: 16px 18px;
-    margin-bottom: 24px;
-  }
-  .alert-section h3 {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--yellow);
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .alert-item {
-    font-size: 12px;
-    color: #5a4810;
-    padding: 4px 0;
-    border-bottom: 1px solid rgba(212,184,96,0.3);
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  .alert-item:last-child { border-bottom: none; }
-  .alert-item-name { font-weight: 600; min-width: 28px; }
+/* ══════════════════════════════════════════════════════
+   資訊區塊（近期行程、待追蹤）
+══════════════════════════════════════════════════════ */
+.info-box {
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 16px;
+}
+.info-box.upcoming { background: var(--blue-bg); border: 1px solid #8ab4d8; }
+.info-box.alert    { background: var(--yellow-bg); border: 1px solid #d4b860; }
+.info-box h3 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.info-box.upcoming h3 { color: var(--blue); }
+.info-box.alert h3    { color: var(--yellow); }
+.info-row {
+  font-size: 12px;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.info-row:last-child { border-bottom: none; }
+.info-row .date { font-weight: 600; min-width: 56px; color: var(--blue); }
+.info-row .name { font-weight: 500; min-width: 28px; }
+.info-row.alert-row .name { color: var(--yellow); font-weight: 600; }
 
-  /* ── Upcoming Section ── */
-  .upcoming-section {
-    background: var(--blue-bg);
-    border: 1px solid #8ab4d8;
-    border-radius: var(--radius);
-    padding: 16px 18px;
-    margin-bottom: 24px;
-  }
-  .upcoming-section h3 {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--blue);
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .upcoming-item {
-    font-size: 12px;
-    color: #1e3d5e;
-    padding: 5px 0;
-    border-bottom: 1px solid rgba(138,180,216,0.3);
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  .upcoming-item:last-child { border-bottom: none; }
-  .upcoming-date { font-weight: 600; min-width: 52px; color: var(--blue); }
-  .upcoming-name { font-weight: 500; min-width: 28px; }
+/* ══════════════════════════════════════════════════════
+   成員卡片格（總覽頁）
+══════════════════════════════════════════════════════ */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 14px;
+}
+.member-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.member-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent-light);
+}
+.member-card.has-alert { border-color: #e8a042; }
+.member-avatar { font-size: 36px; margin-bottom: 8px; }
+.member-name   { font-weight: 600; font-size: 15px; }
+.member-id     { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.alert-dot {
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 8px; height: 8px;
+  background: #e8a042;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.6; transform:scale(1.3); }
+}
 
-  /* ── Member Page ── */
-  .page { display: none; }
-  .page.active { display: block; }
+/* ══════════════════════════════════════════════════════
+   成員頁：頁頭
+══════════════════════════════════════════════════════ */
+.page-header {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow);
+}
+.page-avatar { font-size: 46px; }
+.page-title  { font-family: 'Noto Serif TC', serif; font-size: 22px; font-weight: 700; }
+.page-meta   { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+.page-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 500; }
+.badge-red    { background: var(--red-bg);    color: var(--red);        }
+.badge-blue   { background: var(--blue-bg);   color: var(--blue);       }
+.badge-accent { background: var(--accent-bg); color: var(--accent);     }
+.badge-gray   { background: var(--surface2);  color: var(--text-muted); }
 
-  .page-header {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px 22px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    box-shadow: var(--shadow);
-  }
-  .page-avatar { font-size: 48px; }
-  .page-title { font-family: 'Noto Serif TC', serif; font-size: 22px; font-weight: 700; }
-  .page-meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-  .page-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .badge {
-    font-size: 11px;
-    padding: 3px 9px;
-    border-radius: 20px;
-    font-weight: 500;
-  }
-  .badge-red { background: var(--red-bg); color: var(--red); }
-  .badge-green { background: var(--green-bg); color: var(--green); }
-  .badge-blue { background: var(--blue-bg); color: var(--blue); }
-  .badge-gray { background: var(--surface2); color: var(--text-muted); }
-  .badge-accent { background: var(--accent-bg); color: var(--accent); }
+/* ══════════════════════════════════════════════════════
+   Section 卡片（可折疊）
+══════════════════════════════════════════════════════ */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.section-header {
+  padding: 13px 18px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.section-header:hover { background: #e8e2d8; }
+.section-toggle { margin-left: auto; font-size: 11px; color: var(--text-muted); }
+.section-body.collapsed { display: none; }
 
-  /* ── Section Card ── */
-  .section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    margin-bottom: 16px;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-  }
-  .section-header {
-    padding: 14px 18px;
-    background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    user-select: none;
-  }
-  .section-header:hover { background: #e8e2d8; }
-  .section-toggle { margin-left: auto; color: var(--text-muted); font-size: 12px; }
-  .section-body { padding: 0; }
-  .section-body.collapsed { display: none; }
+/* ══════════════════════════════════════════════════════
+   照顧指南（Care Guide）
+══════════════════════════════════════════════════════ */
+.care-item {
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.care-item:last-child { border-bottom: none; }
+.care-icon   { font-size: 18px; min-width: 22px; text-align: center; margin-top: 1px; }
+.care-title  { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
+.care-detail { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+.care-dates  { margin-top: 6px; font-size: 11px; display: flex; gap: 16px; flex-wrap: wrap; }
+.care-date-label { color: var(--text-muted); }
+.care-date-val   { font-weight: 500; margin-left: 3px; }
+.care-date-val.upcoming { color: var(--blue); font-weight: 600; }
+.imp-high::before { content:'🔴'; margin-right:4px; }
+.imp-mid::before  { content:'🟡'; margin-right:4px; }
 
-  /* ── Care Guide ── */
-  .care-item {
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-  }
-  .care-item:last-child { border-bottom: none; }
-  .care-icon { font-size: 18px; min-width: 24px; text-align: center; margin-top: 1px; }
-  .care-content { flex: 1; }
-  .care-title { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
-  .care-detail { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
-  .care-dates { display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
-  .care-date-item { font-size: 11px; }
-  .care-date-label { color: var(--text-muted); }
-  .care-date-val { font-weight: 500; color: var(--text); margin-left: 4px; }
-  .care-date-val.upcoming { color: var(--blue); font-weight: 600; }
-  .importance-high::before { content: '🔴'; margin-right: 4px; }
-  .importance-mid::before { content: '🟡'; margin-right: 4px; }
+/* ══════════════════════════════════════════════════════
+   用藥清單（Medication）
+══════════════════════════════════════════════════════ */
+.med-schedule-banner {
+  background: var(--accent-bg);
+  padding: 10px 18px;
+  font-size: 12px;
+  color: var(--accent);
+  border-bottom: 1px solid var(--border);
+  line-height: 1.8;
+}
+.med-item {
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.med-item:last-child { border-bottom: none; }
+.med-status {
+  min-width: 50px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+  text-align: center;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+.status-active  { background: var(--green-bg); color: var(--green);       }
+.status-stopped { background: var(--surface2); color: var(--text-muted);  }
+.status-pending { background: var(--yellow-bg); color: var(--yellow);     }
+.med-name   { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
+.med-detail { font-size: 12px; color: var(--text-muted); line-height: 1.55; }
+.med-tags   { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+.med-tag    { font-size: 10px; padding: 2px 7px; border-radius: 10px; background: var(--surface2); color: var(--text-muted); }
+.stopped-toggle {
+  padding: 8px 18px;
+  background: var(--surface2);
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.stopped-toggle:hover { color: var(--accent); }
+.stopped-body { display: none; }
 
-  /* ── Medication ── */
-  .med-item {
-    padding: 12px 18px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-  }
-  .med-item:last-child { border-bottom: none; }
-  .med-status {
-    min-width: 52px;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 7px;
-    border-radius: 20px;
-    text-align: center;
-    margin-top: 1px;
-    white-space: nowrap;
-  }
-  .status-active { background: var(--green-bg); color: var(--green); }
-  .status-stopped { background: var(--surface2); color: var(--text-muted); }
-  .status-paused { background: var(--yellow-bg); color: var(--yellow); }
-  .med-content { flex: 1; }
-  .med-name { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
-  .med-detail { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
-  .med-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
-  .med-tag {
-    font-size: 10px;
-    padding: 2px 7px;
-    border-radius: 10px;
-    background: var(--surface2);
-    color: var(--text-muted);
-  }
+/* ══════════════════════════════════════════════════════
+   時間軸（Timeline）
+══════════════════════════════════════════════════════ */
+.timeline { padding: 8px 0; }
+.tl-item {
+  display: flex;
+  padding: 0 18px;
+  cursor: pointer;
+}
+.tl-left {
+  width: 76px; min-width: 76px;
+  text-align: right;
+  padding-right: 12px;
+  padding-top: 13px;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.3;
+  flex-shrink: 0;
+}
+.tl-line {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 18px;
+}
+.tl-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  margin-top: 15px;
+  flex-shrink: 0;
+  border: 2px solid var(--surface);
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+.tl-dot.alert { background: #e8a042; box-shadow: 0 0 0 2px #e8a042; }
+.tl-connector { width: 2px; flex: 1; background: var(--border); min-height: 8px; }
+.tl-content {
+  flex: 1;
+  padding: 9px 10px 9px 12px;
+  margin: 5px 0;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.tl-item:hover .tl-content,
+.tl-item.expanded .tl-content { background: var(--surface2); }
+.tl-title { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
+.tl-meta  { font-size: 11px; color: var(--text-muted); }
+.tl-tags  { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+.tl-tag   { font-size: 10px; padding: 1px 6px; border-radius: 8px; }
+/* 事件類型顏色 */
+.type-診 { background: var(--blue-bg);   color: var(--blue);   }
+.type-藥 { background: var(--green-bg);  color: var(--green);  }
+.type-檢 { background: var(--accent-bg); color: var(--accent); }
+.type-症 { background: var(--yellow-bg); color: var(--yellow); }
+.type-追 { background: var(--red-bg);    color: var(--red);    }
+/* 展開詳細 */
+.tl-expand {
+  display: none;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+.tl-item.expanded .tl-expand { display: block; }
 
-  /* ── Timeline ── */
-  .timeline { padding: 12px 0; }
-  .tl-item {
-    display: flex;
-    gap: 0;
-    padding: 0 18px;
-    cursor: pointer;
-  }
-  .tl-item:hover .tl-content { background: var(--surface2); }
-  .tl-left {
-    width: 80px;
-    min-width: 80px;
-    text-align: right;
-    padding-right: 14px;
-    padding-top: 12px;
-    font-size: 11px;
-    color: var(--text-muted);
-    line-height: 1.3;
-  }
-  .tl-line {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 20px;
-  }
-  .tl-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: var(--accent-light);
-    margin-top: 16px;
-    flex-shrink: 0;
-    border: 2px solid var(--surface);
-    box-shadow: 0 0 0 2px var(--accent-light);
-  }
-  .tl-dot.alert { background: #e8a042; box-shadow: 0 0 0 2px #e8a042; }
-  .tl-connector {
-    width: 2px;
-    flex: 1;
-    background: var(--border);
-    min-height: 8px;
-  }
-  .tl-content {
-    flex: 1;
-    padding: 10px 10px 10px 12px;
-    margin: 6px 0;
-    border-radius: 8px;
-    transition: background 0.15s;
-  }
-  .tl-title { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
-  .tl-meta { font-size: 11px; color: var(--text-muted); }
-  .tl-tags { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
-  .tl-tag {
-    font-size: 10px;
-    padding: 1px 6px;
-    border-radius: 8px;
-  }
-  .tl-expand { display: none; margin-top: 8px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 8px; }
-  .tl-item.expanded .tl-expand { display: block; }
-  .tl-item.expanded .tl-content { background: var(--surface2); }
+/* ══════════════════════════════════════════════════════
+   Empty State
+══════════════════════════════════════════════════════ */
+.empty { text-align: center; padding: 32px; color: var(--text-muted); font-size: 13px; }
 
-  /* ── Event type colors ── */
-  .type-診 { background: var(--blue-bg); color: var(--blue); }
-  .type-藥 { background: var(--green-bg); color: var(--green); }
-  .type-檢 { background: var(--accent-bg); color: var(--accent); }
-  .type-症 { background: var(--yellow-bg); color: var(--yellow); }
+/* ══════════════════════════════════════════════════════
+   Auth Modal
+══════════════════════════════════════════════════════ */
+.auth-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(44,36,25,0.55);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.auth-overlay.open { display: flex; }
+.auth-box {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 30px;
+  max-width: 300px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+}
+.auth-icon  { font-size: 36px; margin-bottom: 10px; }
+.auth-title { font-family: 'Noto Serif TC', serif; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.auth-sub   { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
+.auth-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 20px;
+  text-align: center;
+  letter-spacing: 0.4em;
+  margin-bottom: 10px;
+  font-family: 'Noto Sans TC', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.auth-input:focus { border-color: var(--accent); }
+.auth-btn {
+  width: 100%;
+  padding: 10px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: 'Noto Sans TC', sans-serif;
+  font-weight: 500;
+}
+.auth-btn:hover { opacity: 0.88; }
+.auth-error  { color: var(--red); font-size: 12px; margin-top: 8px; display: none; }
+.auth-cancel { margin-top: 12px; font-size: 12px; color: var(--text-muted); cursor: pointer; }
+.auth-cancel:hover { color: var(--accent); }
 
-  /* ── Admin Panel ── */
-  .admin-panel {
-    display: none;
-    background: #2c2419;
-    color: #e8dfd0;
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 20px;
-    font-size: 12px;
-  }
-  .admin-panel h3 { color: #c8956a; font-size: 14px; margin-bottom: 12px; }
-  .visibility-grid { display: flex; gap: 10px; flex-wrap: wrap; }
-  .vis-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    padding: 5px 10px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.1);
-    transition: all 0.2s;
-  }
-  .vis-item:hover { background: rgba(255,255,255,0.1); }
-  .vis-item input { cursor: pointer; }
-
-  /* ── Empty state ── */
-  .empty { text-align: center; padding: 32px; color: var(--text-muted); font-size: 13px; }
-
-  /* ── Modal ── */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(44,36,25,0.5);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--surface);
-    border-radius: var(--radius);
-    max-width: 540px;
-    width: 100%;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: var(--shadow-lg);
-  }
-  .modal-header {
-    padding: 18px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .modal-title { font-weight: 700; font-size: 15px; font-family: 'Noto Serif TC', serif; }
-  .modal-close {
-    color: var(--text-muted);
-    cursor: pointer;
-    font-size: 20px;
-    line-height: 1;
-    flex-shrink: 0;
-  }
-  .modal-body { padding: 18px 20px; }
-  .modal-row { margin-bottom: 12px; }
-  .modal-label { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
-  .modal-value { font-size: 13px; color: var(--text); line-height: 1.6; }
-  .modal-value.highlight { color: var(--accent); font-weight: 600; }
-
-  /* ── Auth ── */
-  .auth-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: var(--bg);
-    z-index: 300;
-    align-items: center;
-    justify-content: center;
-  }
-  .auth-overlay.open { display: flex; }
-  .auth-box {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: 32px;
-    max-width: 320px;
-    width: 100%;
-    text-align: center;
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--border);
-  }
-  .auth-icon { font-size: 40px; margin-bottom: 12px; }
-  .auth-title { font-family: 'Noto Serif TC', serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
-  .auth-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
-  .auth-input {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 16px;
-    text-align: center;
-    letter-spacing: 0.3em;
-    margin-bottom: 12px;
-    font-family: 'Noto Sans TC', sans-serif;
-    outline: none;
-  }
-  .auth-input:focus { border-color: var(--accent); }
-  .auth-btn {
-    width: 100%;
-    padding: 10px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    font-family: 'Noto Sans TC', sans-serif;
-    font-weight: 500;
-  }
-  .auth-error { color: var(--red); font-size: 12px; margin-top: 8px; display: none; }
-
-  /* ── Responsive ── */
-  @media (max-width: 600px) {
-    .main { padding: 16px; }
-    .dashboard-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
-    .tl-left { width: 60px; min-width: 60px; }
-    .header h1 { font-size: 16px; }
-  }
+/* ══════════════════════════════════════════════════════
+   Responsive
+══════════════════════════════════════════════════════ */
+@media (max-width: 600px) {
+  .main { padding: 14px; }
+  .dashboard-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+  .tl-left { width: 58px; min-width: 58px; }
+  .header h1 { font-size: 16px; }
+  .page-avatar { font-size: 38px; }
+  .page-title  { font-size: 19px; }
+}
 </style>
 </head>
 <body>
 
-<!-- Auth Overlay -->
-<div class="auth-overlay open" id="authOverlay">
-  <div class="auth-box">
-    <div class="auth-icon">🏥</div>
-    <div class="auth-title">家族健康檔案庫</div>
-    <div class="auth-sub">請輸入管理員密碼以開啟進階功能</div>
-    <input class="auth-input" id="authInput" type="password" maxlength="6" placeholder="••••">
-    <button class="auth-btn" onclick="tryAuth()">確認</button>
-    <div class="auth-error" id="authError">密碼錯誤，請再試一次</div>
-    <div style="margin-top:16px;">
-      <span style="font-size:12px;color:var(--text-muted);cursor:pointer;text-decoration:underline;" onclick="skipAuth()">以訪客身分瀏覽</span>
-    </div>
-  </div>
-</div>
-
-<!-- Header -->
+<!-- ══════════════════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════════════════ -->
 <div class="header">
   <div class="header-inner">
     <div>
@@ -567,87 +531,151 @@
     </div>
     <div class="header-right">
       <span class="admin-badge" id="adminBadge">🔑 管理員</span>
-      <button class="btn-admin" id="adminBtn" onclick="showAuth()">管理員登入</button>
+      <button class="btn-admin" id="adminBtn" onclick="App.auth.showModal()">管理員</button>
     </div>
   </div>
 </div>
 
-<!-- Nav -->
+<!-- ══════════════════════════════════════════════════════
+     NAVIGATION
+     新增成員：在此加入 nav-tab（data-page 對應下方 page id）
+══════════════════════════════════════════════════════ -->
 <div class="nav">
   <div class="nav-inner" id="navInner">
-    <div class="nav-tab active" onclick="showPage('dashboard')">🏠 總覽</div>
-    <div class="nav-tab" onclick="showPage('dad')"><span class="avatar">🧓</span> 爸</div>
-    <div class="nav-tab" onclick="showPage('mom')"><span class="avatar">👩</span> 媽</div>
-    <div class="nav-tab" onclick="showPage('sister1')"><span class="avatar">👩</span> 大姐</div>
-    <div class="nav-tab" onclick="showPage('yv')"><span class="avatar">👩</span> YV</div>
-    <div class="nav-tab member-hidden" data-member="sister2" style="display:none" onclick="showPage('sister2')"><span class="avatar">👩</span> 二姐</div>
-    <div class="nav-tab member-hidden" data-member="grass" style="display:none" onclick="showPage('grass')"><span class="avatar">🐾</span> 草菇</div>
-    <div class="nav-tab member-hidden" data-member="boji" style="display:none" onclick="showPage('boji')"><span class="avatar">🐾</span> 餔幾</div>
+    <div class="nav-tab active" data-page="dashboard">🏠 總覽</div>
+    <div class="nav-tab" data-page="dad">🧓 爸</div>
+    <div class="nav-tab" data-page="mom">👩 媽</div>
+    <div class="nav-tab" data-page="sister1">👩 大姐</div>
+    <div class="nav-tab" data-page="sister2">👩 二姐</div>
+    <div class="nav-tab" data-page="yv">👩 YV</div>
+    <!-- M06、M07：管理員才可見，data-member 對應 visibility.toggle -->
+    <div class="nav-tab hidden-member" data-page="grass" data-member="grass" style="display:none">🐾 草菇</div>
+    <div class="nav-tab hidden-member" data-page="boji"  data-member="boji"  style="display:none">🐾 餔幾</div>
   </div>
 </div>
 
-<!-- Main -->
+<!-- ══════════════════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════════════════ -->
 <div class="main">
 
-  <!-- Admin Panel -->
+  <!-- 管理員面板（登入後顯示） -->
   <div class="admin-panel" id="adminPanel">
     <h3>🔑 管理員設定</h3>
-    <div style="margin-bottom:12px;font-size:12px;color:#a89880;">成員可見性控制</div>
+    <div class="admin-panel-desc">隱藏成員可見性控制</div>
     <div class="visibility-grid">
-      <label class="vis-item"><input type="checkbox" id="vis-sister2" onchange="toggleVisibility('sister2',this.checked)"> 二姐</label>
-      <label class="vis-item"><input type="checkbox" id="vis-grass" onchange="toggleVisibility('grass',this.checked)"> 草菇</label>
-      <label class="vis-item"><input type="checkbox" id="vis-boji" onchange="toggleVisibility('boji',this.checked)"> 餔幾</label>
+      <label class="vis-item">
+        <input type="checkbox" id="vis-grass" onchange="App.visibility.toggle('grass', this.checked)"> 草菇
+      </label>
+      <label class="vis-item">
+        <input type="checkbox" id="vis-boji" onchange="App.visibility.toggle('boji', this.checked)"> 餔幾
+      </label>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════ DASHBOARD ═══ -->
+  <!-- ════════════════════════════════════════
+       PAGE: 總覽（Dashboard）
+  ════════════════════════════════════════ -->
   <div class="page active" id="page-dashboard">
-    <div class="alert-section">
-      <h3>⚠️ 待追蹤事項</h3>
-      <div class="alert-item"><span class="alert-item-name">媽</span>2026/5/22 唾腺閃爍攝影（核子醫學科，09:00 & 10:30，需帶2顆去籽酸梅）</div>
-      <div class="alert-item"><span class="alert-item-name">媽</span>2026/5/25 無張力陰道吊帶手術（奇美婦產科，吳銘斌醫師）住院至5/26</div>
-      <div class="alert-item"><span class="alert-item-name">媽</span>2026/5/26 精神科回診（樂行診所，上午，號碼0036）</div>
-      <div class="alert-item"><span class="alert-item-name">媽</span>2026/6/1 風濕免疫科回診（奇美，林永章醫師，看診號77）</div>
-      <div class="alert-item"><span class="alert-item-name">爸</span>2026/8/20 胸腔外科回診（奇美，謝俊民醫師）</div>
-      <div class="alert-item"><span class="alert-item-name">大姐</span>2023年奇美健檢結果未補充</div>
-      <div class="alert-item"><span class="alert-item-name">YV</span>2023年奇美健檢（舒心順頸）結果未補充</div>
-    </div>
 
-    <div class="upcoming-section">
+    <!-- 近期行程（先顯示） -->
+    <div class="info-box upcoming">
       <h3>📅 近期行程</h3>
-      <div class="upcoming-item"><span class="upcoming-date">5/22</span><span class="upcoming-name">媽</span>唾腺閃爍攝影 × 2次（09:00, 10:30）</div>
-      <div class="upcoming-item"><span class="upcoming-date">5/25–26</span><span class="upcoming-name">媽</span>婦產科手術 + 住院</div>
-      <div class="upcoming-item"><span class="upcoming-date">5/26</span><span class="upcoming-name">媽</span>樂行診所精神科回診（上午）</div>
-      <div class="upcoming-item"><span class="upcoming-date">6/1</span><span class="upcoming-name">媽</span>風濕免疫科回診（奇美 林永章）</div>
-      <div class="upcoming-item"><span class="upcoming-date">8/20</span><span class="upcoming-name">爸</span>胸腔外科回診（奇美 謝俊民）</div>
+      <div class="info-row">
+        <span class="date">5/22</span>
+        <span class="name">媽</span>
+        <span>唾腺閃爍攝影 × 2次（09:00 &amp; 10:30，奇美核子醫學科）</span>
+      </div>
+      <div class="info-row">
+        <span class="date">5/25–26</span>
+        <span class="name">媽</span>
+        <span>婦產科 Mini Stop 手術 + 住院（吳銘斌醫師，上午9:00報到）</span>
+      </div>
+      <div class="info-row">
+        <span class="date">5/26</span>
+        <span class="name">媽</span>
+        <span>樂行診所精神科回診（上午，0036號）</span>
+      </div>
+      <div class="info-row">
+        <span class="date">6/1</span>
+        <span class="name">媽</span>
+        <span>風濕免疫科回診（奇美，林永章醫師，看診號77）</span>
+      </div>
+      <div class="info-row">
+        <span class="date">8/20</span>
+        <span class="name">爸</span>
+        <span>胸腔外科回診（奇美，謝俊民醫師）</span>
+      </div>
     </div>
 
+    <!-- 待追蹤事項（後顯示） -->
+    <div class="info-box alert">
+      <h3>⚠️ 待追蹤事項</h3>
+      <div class="info-row alert-row">
+        <span class="name">媽</span>
+        <span>5/25手術後需確認婦產科回診排程</span>
+      </div>
+      <div class="info-row alert-row">
+        <span class="name">媽</span>
+        <span>優潔通（賀爾蒙藥）劑量與服用頻率待藥單確認</span>
+      </div>
+      <div class="info-row alert-row">
+        <span class="name">大姐</span>
+        <span>2023/10/16 奇美健檢結果未填</span>
+      </div>
+      <div class="info-row alert-row">
+        <span class="name">YV</span>
+        <span>2023/10/16 奇美健檢（舒心順頸）結果未填</span>
+      </div>
+    </div>
+
+    <!-- 成員卡片 -->
     <div class="dashboard-grid">
-      <div class="member-card has-alert" onclick="showPage('dad')">
+      <div class="member-card" onclick="App.nav.go('dad')">
         <div class="member-avatar">🧓</div>
         <div class="member-name">爸</div>
         <div class="member-id">M01</div>
       </div>
-      <div class="member-card has-alert" onclick="showPage('mom')">
+      <div class="member-card has-alert" onclick="App.nav.go('mom')">
         <div class="alert-dot"></div>
         <div class="member-avatar">👩</div>
         <div class="member-name">媽</div>
         <div class="member-id">M02</div>
       </div>
-      <div class="member-card has-alert" onclick="showPage('sister1')">
+      <div class="member-card has-alert" onclick="App.nav.go('sister1')">
         <div class="member-avatar">👩</div>
         <div class="member-name">大姐</div>
         <div class="member-id">M03</div>
       </div>
-      <div class="member-card" onclick="showPage('yv')">
+      <div class="member-card" onclick="App.nav.go('sister2')">
+        <div class="member-avatar">👩</div>
+        <div class="member-name">二姐</div>
+        <div class="member-id">M04</div>
+      </div>
+      <div class="member-card has-alert" onclick="App.nav.go('yv')">
         <div class="member-avatar">👩</div>
         <div class="member-name">YV</div>
         <div class="member-id">M05</div>
       </div>
+      <!-- M06、M07：管理員開啟後才顯示 -->
+      <div class="member-card hidden-member" data-member="grass" style="display:none" onclick="App.nav.go('grass')">
+        <div class="member-avatar">🐾</div>
+        <div class="member-name">草菇</div>
+        <div class="member-id">M06</div>
+      </div>
+      <div class="member-card hidden-member" data-member="boji" style="display:none" onclick="App.nav.go('boji')">
+        <div class="member-avatar">🐾</div>
+        <div class="member-name">餔幾</div>
+        <div class="member-id">M07</div>
+      </div>
     </div>
-  </div>
 
-  <!-- ═══════════════════════════════════════ 爸 ═══ -->
+  </div><!-- /page-dashboard -->
+
+
+  <!-- ════════════════════════════════════════
+       PAGE: 爸（M01）
+  ════════════════════════════════════════ -->
   <div class="page" id="page-dad">
     <div class="page-header">
       <div class="page-avatar">🧓</div>
@@ -663,73 +691,73 @@
       </div>
     </div>
 
-    <!-- 照顧指南 -->
+    <!-- 爸：照顧指南 -->
     <div class="section">
-      <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-header" onclick="App.section.toggle(this)">
         🗓️ 照顧指南 <span class="section-toggle">▲</span>
       </div>
       <div class="section-body">
         <div class="care-item">
-          <div class="care-icon">🏥</div>
-          <div class="care-content">
-            <div class="care-title importance-high">高血壓用藥（協和家醫）</div>
-            <div class="care-detail">侯醫師，每月拿藥取回</div>
+          <div class="care-icon">💊</div>
+          <div>
+            <div class="care-title imp-high">高血壓用藥（協和家醫）</div>
+            <div class="care-detail">侯醫師，每月回診拿藥</div>
             <div class="care-dates">
-              <div class="care-date-item"><span class="care-date-label">頻率</span><span class="care-date-val">每月一次</span></div>
+              <span class="care-date-label">頻率</span><span class="care-date-val">每月一次</span>
             </div>
           </div>
         </div>
         <div class="care-item">
           <div class="care-icon">🔬</div>
-          <div class="care-content">
-            <div class="care-title importance-high">B肝追蹤（德欣診所）</div>
+          <div>
+            <div class="care-title imp-high">B肝追蹤（德欣診所）</div>
             <div class="care-detail">半年一次抽血＋超音波</div>
             <div class="care-dates">
-              <div class="care-date-item"><span class="care-date-label">頻率</span><span class="care-date-val">半年一次</span></div>
+              <span class="care-date-label">頻率</span><span class="care-date-val">半年一次</span>
             </div>
           </div>
         </div>
         <div class="care-item">
           <div class="care-icon">👁️</div>
-          <div class="care-content">
-            <div class="care-title importance-high">眼科追蹤（年明眼科）</div>
+          <div>
+            <div class="care-title imp-high">眼科追蹤（年明眼科）</div>
             <div class="care-detail">陳昌文院長，白內障術後追蹤＋青光眼定期追蹤</div>
             <div class="care-dates">
-              <div class="care-date-item"><span class="care-date-label">頻率</span><span class="care-date-val">定期追蹤</span></div>
+              <span class="care-date-label">頻率</span><span class="care-date-val">定期追蹤</span>
             </div>
           </div>
         </div>
         <div class="care-item">
           <div class="care-icon">🫁</div>
-          <div class="care-content">
-            <div class="care-title importance-mid">胸腔外科（奇美）</div>
+          <div>
+            <div class="care-title imp-mid">胸腔外科（奇美）</div>
             <div class="care-detail">謝俊民醫師，半年一次回診照X光</div>
             <div class="care-dates">
-              <div class="care-date-item"><span class="care-date-label">頻率</span><span class="care-date-val">半年一次</span></div>
-              <div class="care-date-item"><span class="care-date-label">下次</span><span class="care-date-val upcoming">2026/8/20</span></div>
+              <span class="care-date-label">下次</span>
+              <span class="care-date-val upcoming">2026/8/20</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 用藥清單 -->
+    <!-- 爸：用藥清單 -->
     <div class="section">
-      <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-header" onclick="App.section.toggle(this)">
         💊 用藥清單 <span class="section-toggle">▲</span>
       </div>
       <div class="section-body">
         <div class="med-item">
           <div class="med-status status-active">服用中</div>
-          <div class="med-content">
+          <div>
             <div class="med-name">汎穩壓 160mg</div>
-            <div class="med-detail">高血壓用藥。每月協和家醫侯醫師拿藥。2026/4/15起取代得安穩80mg。</div>
+            <div class="med-detail">高血壓用藥。2026/4/15起取代得安穩80mg。每月協和家醫侯醫師拿藥。</div>
             <div class="med-tags"><span class="med-tag">家醫科</span></div>
           </div>
         </div>
         <div class="med-item">
           <div class="med-status status-stopped">已停藥</div>
-          <div class="med-content">
+          <div>
             <div class="med-name">得安穩 80mg</div>
             <div class="med-detail">2026/4/15起改用汎穩壓160mg</div>
             <div class="med-tags"><span class="med-tag">家醫科</span><span class="med-tag">停藥 2026/4/14</span></div>
@@ -738,24 +766,24 @@
       </div>
     </div>
 
-    <!-- 事件時間軸 -->
+    <!-- 爸：事件時間軸 -->
     <div class="section">
-      <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-header" onclick="App.section.toggle(this)">
         📋 事件紀錄 <span class="section-toggle">▲</span>
       </div>
       <div class="section-body">
         <div class="timeline">
-          <div class="tl-item" onclick="expandTL(this)">
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2026/8/20</div>
             <div class="tl-line"><div class="tl-dot alert"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
               <div class="tl-title">胸腔外科回診（奇美）</div>
-              <div class="tl-meta">奇美 謝俊民醫師 · 46診間</div>
-              <div class="tl-tags"><span class="tl-tag type-診">看診</span><span class="tl-tag badge-red">待追蹤</span></div>
-              <div class="tl-expand">預約回診，先開X-ray。看診號4號。地點：46診間（第一醫療大樓2F）。</div>
+              <div class="tl-meta">謝俊民醫師 · 46診間（第一醫療大樓2F）</div>
+              <div class="tl-tags"><span class="tl-tag type-診">看診</span><span class="tl-tag type-追">待追蹤</span></div>
+              <div class="tl-expand">預約回診，先開X-ray。看診號4號。</div>
             </div>
           </div>
-          <div class="tl-item" onclick="expandTL(this)">
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2026/4/15</div>
             <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
@@ -765,52 +793,55 @@
               <div class="tl-expand">得安穩80mg → 汎穩壓160mg（口頭得知）</div>
             </div>
           </div>
-          <div class="tl-item" onclick="expandTL(this)">
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2026/1/6</div>
             <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
-              <div class="tl-title">左眼白內障手術</div>
-              <div class="tl-meta">慶明眼科</div>
+              <div class="tl-title">左眼白內障手術（慶明眼科）</div>
+              <div class="tl-meta">飛秒手術</div>
               <div class="tl-tags"><span class="tl-tag type-診">看診</span></div>
               <div class="tl-expand">飛秒手術（50000）。水晶體：延焦段＋非球面（無散光矯正）。</div>
             </div>
           </div>
-          <div class="tl-item" onclick="expandTL(this)">
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2025/11/26</div>
             <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
-              <div class="tl-title">右眼白內障手術</div>
-              <div class="tl-meta">慶明眼科</div>
+              <div class="tl-title">右眼白內障手術（慶明眼科）</div>
+              <div class="tl-meta">Rayner RAO210T Sph +18.50D</div>
               <div class="tl-tags"><span class="tl-tag type-診">看診</span></div>
               <div class="tl-expand">飛秒手術（50000）。水晶體：Rayner RAO210T Sph +18.50D，延焦段＋非球面＋散光矯正，英國製造。</div>
             </div>
           </div>
-          <div class="tl-item" onclick="expandTL(this)">
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2025/11/1</div>
             <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
-              <div class="tl-title">白內障手術前諮詢</div>
-              <div class="tl-meta">年明眼科 范小姐</div>
+              <div class="tl-title">白內障手術前諮詢（年明眼科）</div>
+              <div class="tl-meta">范小姐諮詢</div>
               <div class="tl-tags"><span class="tl-tag type-診">看診</span></div>
               <div class="tl-expand">選延焦段水晶體（RAO210T Rayner）。三焦點夜間易眩光不適合（爸有夜間開車）。右眼附加散光矯正。術後青光眼藥水繼續點。</div>
             </div>
           </div>
-          <div class="tl-item" onclick="expandTL(this)">
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2023/10/16</div>
             <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
               <div class="tl-title">奇美家庭健康檢查</div>
-              <div class="tl-meta">奇美醫院</div>
+              <div class="tl-meta">方案：顧腸護胃24000＋頸動脈超音波3000</div>
               <div class="tl-tags"><span class="tl-tag type-檢">檢查結果</span></div>
-              <div class="tl-expand">方案：顧腸護胃24000＋頸動脈超音波3000。診斷：糜爛性食道炎/黏膜破損、良性胃息肉、大腸0.3cm息肉。建議少喝酒，約兩年門診追蹤。</div>
+              <div class="tl-expand">診斷：糜爛性食道炎/黏膜破損、良性胃息肉、大腸0.3cm息肉。建議少喝酒，約兩年門診追蹤。開立泰克胃通一個月。</div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </div><!-- /page-dad -->
 
-  <!-- ═══════════════════════════════════════ 媽 ═══ -->
+
+  <!-- ════════════════════════════════════════
+       PAGE: 媽（M02）
+  ════════════════════════════════════════ -->
   <div class="page" id="page-mom">
     <div class="page-header">
       <div class="page-avatar">👩</div>
@@ -818,274 +849,336 @@
         <div class="page-title">媽</div>
         <div class="page-meta">M02</div>
         <div class="page-badges">
-          <span class="badge badge-red">乾燥症（2026/5確診）</span>
+          <span class="badge badge-red">乾燥症</span>
           <span class="badge badge-blue">精神科追蹤中</span>
           <span class="badge badge-accent">骨科（脊椎）治療史</span>
         </div>
       </div>
     </div>
 
-    <!-- 照顧指南 -->
+    <!-- 媽：照顧指南 -->
     <div class="section">
-      <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-header" onclick="App.section.toggle(this)">
         🗓️ 照顧指南 <span class="section-toggle">▲</span>
       </div>
       <div class="section-body">
         <div class="care-item">
           <div class="care-icon">🔬</div>
-          <div class="care-content">
-            <div class="care-title importance-high">唾腺閃爍攝影（奇美核子醫學科）</div>
-            <div class="care-detail">Sialoscintigraphy，需做2次。攜帶2顆去籽酸梅（檢查前勿食）、去除金屬飾品、排空膀胱、需完全平躺。台南或高雄停班日當日停止檢查。</div>
+          <div>
+            <div class="care-title imp-high">唾腺閃爍攝影（奇美核子醫學科）</div>
+            <div class="care-detail">
+              Sialoscintigraphy，需做2次（09:00 &amp; 10:30）。<br>
+              ⚠️ 攜帶2顆去籽酸梅（檢查前勿食）；去除金屬飾品；排空膀胱；需完全平躺。<br>
+              台南或高雄停班日當日停止檢查，請來電確認。
+            </div>
             <div class="care-dates">
-              <div class="care-date-item"><span class="care-date-label">預定</span><span class="care-date-val upcoming">2026/5/22 09:00 & 10:30</span></div>
+              <span class="care-date-label">預定</span>
+              <span class="care-date-val upcoming">2026/5/22</span>
             </div>
           </div>
         </div>
         <div class="care-item">
           <div class="care-icon">🏥</div>
-          <div class="care-content">
-            <div class="care-title importance-high">婦產科手術（奇美，吳銘斌醫師）</div>
-            <div class="care-detail">無張力陰道吊帶手術（TVT/TOT），預計住院一天。術後需確認回診排程。</div>
+          <div>
+            <div class="care-title imp-high">婦產科手術（奇美，吳銘斌醫師）</div>
+            <div class="care-detail">
+              Mini Stop (APIS) 手術。入院診斷：應力性尿失禁、急迫性尿失禁、頻尿。<br>
+              麻醉：IVGA（靜脈全身麻醉）。自費：腦波導引理想鎮靜術 8000元。<br>
+              報到：<strong>上午9:00整</strong>，第二醫療大樓2樓住院服務中心。<br>
+              攜帶：健保卡、身分證、住院許可證。住院前晚12:00起禁食（含開水）。
+            </div>
             <div class="care-dates">
-              <div class="care-date-item"><span class="care-date-label">手術</span><span class="care-date-val upcoming">2026/5/25（住院至5/26）</span></div>
+              <span class="care-date-label">手術日</span>
+              <span class="care-date-val upcoming">2026/5/25（住院至5/26出院）</span>
             </div>
           </div>
         </div>
         <div class="care-item">
           <div class="care-icon">🫁</div>
-          <div class="care-content">
-            <div class="care-title importance-high">風濕免疫科（奇美）</div>
+          <div>
+            <div class="care-title imp-high">風濕免疫科（奇美）</div>
             <div class="care-detail">林永章醫師，乾燥症確診後定期追蹤</div>
             <div class="care-dates">
-              <div class="care-date-item"><span class="care-date-label">上次</span><span class="care-date-val">2026/5/18</span></div>
-              <div class="care-date-item"><span class="care-date-label">下次</span><span class="care-date-val upcoming">2026/6/1</span></div>
+              <span class="care-date-label">上次</span><span class="care-date-val">2026/5/18</span>
+              &nbsp;&nbsp;
+              <span class="care-date-label">下次</span><span class="care-date-val upcoming">2026/6/1（看診號77）</span>
             </div>
           </div>
         </div>
         <div class="care-item">
           <div class="care-icon">🧠</div>
-          <div class="care-content">
-            <div class="care-title importance-mid">精神科（樂行診所）</div>
-            <div class="care-detail">李吉特醫師。每月回診取藥。地址：台南市仁德區中正路二段1116號，電話：2705633</div>
+          <div>
+            <div class="care-title imp-mid">精神科（樂行診所）</div>
+            <div class="care-detail">
+              李吉特醫師，每月回診取藥。<br>
+              地址：台南市仁德區中正路二段1116號　電話：2705633
+            </div>
             <div class="care-dates">
-              <div class="care-date-item"><span class="care-date-label">上次</span><span class="care-date-val">2026/4/28</span></div>
-              <div class="care-date-item"><span class="care-date-label">下次</span><span class="care-date-val upcoming">2026/5/26 上午（0036號）</span></div>
+              <span class="care-date-label">上次</span><span class="care-date-val">2026/4/28</span>
+              &nbsp;&nbsp;
+              <span class="care-date-label">下次</span><span class="care-date-val upcoming">2026/5/26 上午（0036號）</span>
             </div>
           </div>
         </div>
         <div class="care-item">
           <div class="care-icon">💊</div>
-          <div class="care-content">
-            <div class="care-title importance-mid">賀爾蒙藥與保健品（婦產科）</div>
-            <div class="care-detail">婦產科陳建廷醫師開立，藥單待補充。晚餐後約8:00服用。保健品：葉黃素、魚油、B群（服用規律待確認）。</div>
+          <div>
+            <div class="care-title imp-mid">賀爾蒙藥與保健品（婦產科）</div>
+            <div class="care-detail">
+              婦產科陳建廷醫師開立，晚餐後約8:00服用。<br>
+              保健品：葉黃素、魚油、B群（服用規律待確認）。
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 用藥 -->
+    <!-- 媽：用藥清單 -->
     <div class="section">
-      <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-header" onclick="App.section.toggle(this)">
         💊 目前用藥 <span class="section-toggle">▲</span>
       </div>
       <div class="section-body">
-        <div style="background:var(--accent-bg);padding:10px 18px;font-size:12px;color:var(--accent);border-bottom:1px solid var(--border);">
-          ⏰ <strong>服藥時間表：</strong>早餐後 → 奎寧、液泌快｜晚餐後 → 奎寧、液泌快、賀爾蒙藥（約8:00）｜睡前 → 贊安諾、可那平、Sertraline（彈性，有時半夜醒來才吃）
+        <!-- 服藥時間表 Banner -->
+        <div class="med-schedule-banner">
+          ⏰ <strong>服藥時間表</strong><br>
+          早餐後 → 奎寧、液泌快<br>
+          晚餐後 → 奎寧、液泌快、優潔通（約8:00）<br>
+          睡前（彈性）→ 贊安諾、可那平、Sertraline（有時半夜醒來才吃）
         </div>
+
         <div class="med-item">
           <div class="med-status status-active">服用中</div>
-          <div class="med-content">
+          <div>
             <div class="med-name">奎寧-Hydroxychloroquine (Plaquenil) 必賴克廔 200mg</div>
-            <div class="med-detail">乾燥症用藥。飯後服用；可能感暈眩或影響視覺，開車或操作機械者須小心。</div>
-            <div class="med-tags"><span class="med-tag">風濕免疫科</span><span class="med-tag">早、晚飯後</span><span class="med-tag">開始 2026/5/18</span></div>
+            <div class="med-detail">乾燥症用藥。飯後服用。可能感暈眩或影響視覺，開車或操作機械者須小心。</div>
+            <div class="med-tags">
+              <span class="med-tag">風濕免疫科</span>
+              <span class="med-tag">早、晚飯後</span>
+              <span class="med-tag">開始 2026/5/18</span>
+            </div>
           </div>
         </div>
+
         <div class="med-item">
           <div class="med-status status-active">服用中</div>
-          <div class="med-content">
+          <div>
             <div class="med-name">液泌快-Pilocarpine (Salicret) 5mg</div>
-            <div class="med-detail">治療唾腺分泌功能低下引起之口乾。飯後服用；可能多汗、頭痛、頻尿；服藥後若有視覺模糊請避免開車；需補充水分。</div>
-            <div class="med-tags"><span class="med-tag">風濕免疫科</span><span class="med-tag">早、晚飯後</span><span class="med-tag">開始 2026/5/18</span></div>
+            <div class="med-detail">治療唾腺分泌功能低下引起之口乾。飯後服用。可能多汗、頭痛、頻尿；服後視覺模糊請避免開車；需補充水分。</div>
+            <div class="med-tags">
+              <span class="med-tag">風濕免疫科</span>
+              <span class="med-tag">早、晚飯後</span>
+              <span class="med-tag">開始 2026/5/18</span>
+            </div>
           </div>
         </div>
+
         <div class="med-item">
           <div class="med-status status-active">服用中</div>
-          <div class="med-content">
-            <div class="med-name">賀爾蒙藥（婦產科，藥單待補）</div>
-            <div class="med-detail">婦產科陳建廷醫師開立，藥名劑量待補充。晚餐後約8:00服用。</div>
-            <div class="med-tags"><span class="med-tag">婦產科</span><span class="med-tag">晚飯後</span></div>
+          <div>
+            <div class="med-name">優潔通-Utrogestan (Progesterone) 100mg</div>
+            <div class="med-detail">賀爾蒙藥（黃體素），婦產科陳建廷醫師開立，軟膠囊。晚餐後約8:00服用。劑量頻率待藥單確認。</div>
+            <div class="med-tags">
+              <span class="med-tag">婦產科</span>
+              <span class="med-tag">晚飯後約8:00</span>
+            </div>
           </div>
         </div>
+
         <div class="med-item">
           <div class="med-status status-active">服用中</div>
-          <div class="med-content">
+          <div>
             <div class="med-name">贊安諾-Alprazolam 0.5mg</div>
-            <div class="med-detail">焦慮狀態用藥。睡前服用（三種精神科藥一起吃）。有時媽直接先睡著，若半夜醒來尚需繼續入睡再吃。服後避免開車及危險工作。</div>
-            <div class="med-tags"><span class="med-tag">精神科/樂行</span><span class="med-tag">睡前（彈性）</span><span class="med-tag">開始 2026/4/28</span></div>
+            <div class="med-detail">焦慮狀態用藥。睡前服用（與另兩種精神科藥一起吃）。媽有時直接先睡，若半夜醒來尚需繼續入睡再吃。服後避免開車及危險工作。</div>
+            <div class="med-tags">
+              <span class="med-tag">精神科/樂行</span>
+              <span class="med-tag">睡前（彈性）</span>
+              <span class="med-tag">開始 2026/4/28</span>
+            </div>
           </div>
         </div>
+
         <div class="med-item">
           <div class="med-status status-active">服用中</div>
-          <div class="med-content">
+          <div>
             <div class="med-name">可那平-Rivopam 0.5mg</div>
-            <div class="med-detail">緩解手腳痙攣/安神抗震顫。睡前服用（三種精神科藥一起吃）。避免喝酒。</div>
-            <div class="med-tags"><span class="med-tag">精神科/樂行</span><span class="med-tag">睡前（彈性）</span><span class="med-tag">開始 2026/4/28</span></div>
+            <div class="med-detail">緩解手腳痙攣/安神抗震顫。睡前服用（與另兩種精神科藥一起吃）。避免喝酒。</div>
+            <div class="med-tags">
+              <span class="med-tag">精神科/樂行</span>
+              <span class="med-tag">睡前（彈性）</span>
+              <span class="med-tag">開始 2026/4/28</span>
+            </div>
           </div>
         </div>
+
         <div class="med-item">
           <div class="med-status status-active">服用中</div>
-          <div class="med-content">
+          <div>
             <div class="med-name">Purtraline-Sertraline 50mg（每次半顆）</div>
-            <div class="med-detail">憂鬱、強迫、恐慌、經前不悅等。睡前服用（三種精神科藥一起吃）。副作用：噁心、軟便等。</div>
-            <div class="med-tags"><span class="med-tag">精神科/樂行</span><span class="med-tag">睡前（彈性）</span><span class="med-tag">開始 2026/4/28</span></div>
-          </div>
-        </div>
-        <!-- Stopped meds collapsed -->
-        <div style="background:var(--surface2);padding:8px 18px;border-top:1px solid var(--border);">
-          <span style="font-size:11px;color:var(--text-muted);cursor:pointer;" onclick="toggleStoppedMeds(this)">▼ 查看舊用藥（已停藥 / 舊版名稱）</span>
-          <div id="stopped-meds-mom" style="display:none;margin-top:10px;">
-            <div class="med-item" style="padding:8px 0;">
-              <div class="med-status status-stopped">已停藥</div>
-              <div class="med-content">
-                <div class="med-name">NICAMET 50mg（江佳脈）</div>
-                <div class="med-detail">春霖診所 蘇春霖。2022/6/22–6/28。換診所後停藥。</div>
-                <div class="med-tags"><span class="med-tag">身心科/春霖</span></div>
-              </div>
-            </div>
-            <div class="med-item" style="padding:8px 0;">
-              <div class="med-status status-stopped">已停藥</div>
-              <div class="med-content">
-                <div class="med-name">TAEE 5mg（大益糖衣錠）</div>
-                <div class="med-detail">春霖診所。2022/6/22起，2022/6/29拿掉晚上劑。後換診所停藥。</div>
-                <div class="med-tags"><span class="med-tag">身心科/春霖</span></div>
-              </div>
-            </div>
-            <div class="med-item" style="padding:8px 0;">
-              <div class="med-status status-stopped">已停藥</div>
-              <div class="med-content">
-                <div class="med-name">LARPAM 2mg（樂眠）</div>
-                <div class="med-detail">春霖診所。2022/6/29–7/12。改用永淨（殘尿感）後停藥。</div>
-                <div class="med-tags"><span class="med-tag">身心科/春霖</span></div>
-              </div>
+            <div class="med-detail">憂鬱、強迫、恐慌、經前不悅等。睡前服用（與另兩種精神科藥一起吃）。副作用：噁心、軟便等。</div>
+            <div class="med-tags">
+              <span class="med-tag">精神科/樂行</span>
+              <span class="med-tag">睡前（彈性）</span>
+              <span class="med-tag">開始 2026/4/28</span>
             </div>
           </div>
         </div>
+
+        <!-- 舊用藥折疊 -->
+        <div class="stopped-toggle" onclick="App.section.toggleStopped(this)">
+          ▼ 查看舊用藥（已停藥）
+        </div>
+        <div class="stopped-body">
+          <div class="med-item">
+            <div class="med-status status-stopped">已停藥</div>
+            <div>
+              <div class="med-name">NICAMET 50mg（江佳脈）</div>
+              <div class="med-detail">春霖診所 蘇春霖。2022/6/22–6/28，換診所後停藥。</div>
+              <div class="med-tags"><span class="med-tag">身心科/春霖</span></div>
+            </div>
+          </div>
+          <div class="med-item">
+            <div class="med-status status-stopped">已停藥</div>
+            <div>
+              <div class="med-name">TAEE 5mg（大益糖衣錠）</div>
+              <div class="med-detail">春霖診所，2022/6/22起，2022/6/29拿掉晚上劑，後換診所停藥。</div>
+              <div class="med-tags"><span class="med-tag">身心科/春霖</span></div>
+            </div>
+          </div>
+          <div class="med-item">
+            <div class="med-status status-stopped">已停藥</div>
+            <div>
+              <div class="med-name">LARPAM 2mg（樂眠）</div>
+              <div class="med-detail">春霖診所，2022/6/29–7/12，改用永淨（殘尿感）後停藥。</div>
+              <div class="med-tags"><span class="med-tag">身心科/春霖</span></div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- 事件時間軸 -->
+    <!-- 媽：事件時間軸 -->
     <div class="section">
-      <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-header" onclick="App.section.toggle(this)">
         📋 事件紀錄 <span class="section-toggle">▲</span>
       </div>
       <div class="section-body">
         <div class="timeline">
-          <div class="tl-item" onclick="expandTL(this)">
+
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2026/5/25</div>
             <div class="tl-line"><div class="tl-dot alert"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
-              <div class="tl-title">婦產科無張力陰道吊帶手術（奇美）</div>
-              <div class="tl-meta">奇美 吳銘斌醫師 · 住院至5/26</div>
-              <div class="tl-tags"><span class="tl-tag type-診">看診</span><span class="tl-tag badge-red">待追蹤</span></div>
-              <div class="tl-expand">無張力陰道吊帶手術（TVT/TOT）執行，住院一天到5/26出院。術後須確認回診排程。</div>
+              <div class="tl-title">婦產科 Mini Stop 手術（奇美）</div>
+              <div class="tl-meta">吳銘斌醫師 · 住院至5/26出院</div>
+              <div class="tl-tags"><span class="tl-tag type-診">看診</span><span class="tl-tag type-追">待追蹤</span></div>
+              <div class="tl-expand">
+                手術：Mini Stop (APIS)。入院診斷：應力性尿失禁、急迫性尿失禁、頻尿。<br>
+                麻醉：IVGA（靜脈全身麻醉）。自費：腦波導引理想鎮靜術 8000元（林明忠醫師）。<br>
+                報到：2026/5/25 上午9:00，第二醫療大樓2樓住院服務中心。<br>
+                住院前晚12:00起禁食（含開水）。術後需確認回診排程。
+              </div>
             </div>
           </div>
-          <div class="tl-item" onclick="expandTL(this)">
+
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2026/5/18</div>
             <div class="tl-line"><div class="tl-dot alert"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
               <div class="tl-title">風濕免疫科回診 — 乾燥症確診</div>
               <div class="tl-meta">奇美 林永章醫師</div>
-              <div class="tl-tags"><span class="tl-tag type-診">看診</span><span class="tl-tag badge-red">待追蹤</span></div>
-              <div class="tl-expand">確診乾燥症。新開：奎寧-Hydroxychloroquine 200mg、液泌快-Pilocarpine 5mg（早晚飯後各1顆）。追蹤：5/22唾腺閃爍攝影、6/1回診。</div>
+              <div class="tl-tags"><span class="tl-tag type-診">看診</span><span class="tl-tag type-追">待追蹤</span></div>
+              <div class="tl-expand">確診乾燥症。新開：奎寧-Hydroxychloroquine 200mg、液泌快-Pilocarpine 5mg（早晚飯後各1顆）。後續：5/22唾腺閃爍攝影、6/1回診。</div>
             </div>
           </div>
-          <div class="tl-item" onclick="expandTL(this)">
+
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2026/5/11</div>
             <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
-              <div class="tl-title">風濕免疫科初診（奇美，擔心乾燥症）</div>
-              <div class="tl-meta">奇美 林永章醫師</div>
+              <div class="tl-title">風濕免疫科初診（奇美）</div>
+              <div class="tl-meta">林永章醫師 · 擔心乾燥症</div>
               <div class="tl-tags"><span class="tl-tag type-診">看診</span></div>
-              <div class="tl-expand">症狀：自身免疫相關。安排全套血液＋修格蘭氏抗體＋抗細胞核抗體＋超音波。下次5/18回診確認結果。</div>
+              <div class="tl-expand">安排全套血液＋修格蘭氏抗體＋抗細胞核抗體＋頭頸軟組織超音波。下次5/18回診確認結果。</div>
             </div>
           </div>
-          <div class="tl-item" onclick="expandTL(this)">
+
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2026/4/28</div>
             <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
               <div class="tl-title">精神科回診（樂行診所）</div>
-              <div class="tl-meta">樂行診所 李吉特醫師</div>
+              <div class="tl-meta">李吉特醫師</div>
               <div class="tl-tags"><span class="tl-tag type-診">看診</span></div>
               <div class="tl-expand">續開：贊安諾-Alprazolam 0.5mg、可那平-Rivopam 0.5mg、Purtraline-Sertraline 50mg半顆（均睡前服用）。下次回診5/26。</div>
             </div>
           </div>
-          <div class="tl-item" onclick="expandTL(this)">
+
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2026/4/20</div>
             <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
               <div class="tl-title">婦產科手術評估（奇美）</div>
-              <div class="tl-meta">奇美 吳銘斌醫師</div>
+              <div class="tl-meta">吳銘斌醫師</div>
               <div class="tl-tags"><span class="tl-tag type-診">看診</span></div>
-              <div class="tl-expand">評估無張力陰道吊帶手術（TVT/TOT）適合性，評估通過，安排2026/5/25手術。</div>
+              <div class="tl-expand">評估 Mini Stop (APIS) 手術適合性，評估通過，安排2026/5/25手術。</div>
             </div>
           </div>
-          <div class="tl-item" onclick="expandTL(this)">
+
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2023/10/16</div>
             <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
               <div class="tl-title">奇美家庭健康檢查</div>
-              <div class="tl-meta">奇美醫院</div>
+              <div class="tl-meta">方案：顧腸護肝29000</div>
               <div class="tl-tags"><span class="tl-tag type-檢">檢查結果</span></div>
-              <div class="tl-expand">方案：顧腸護肝29000。診斷：胃潰瘍痕跡、食道發炎、良性息肉、大腸外痔。建議少量多餐、不要空腹喝茶。開立泰克胃通三個月。</div>
+              <div class="tl-expand">診斷：胃潰瘍痕跡、食道發炎、良性息肉、大腸外痔。建議少量多餐、不要空腹喝茶。開立泰克胃通三個月。</div>
             </div>
           </div>
-          <div class="tl-item" onclick="expandTL(this)">
-            <div class="tl-left">2021/8/31</div>
-            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
-            <div class="tl-content">
-              <div class="tl-title">骨科治療結束（吳芳峻診所）</div>
-              <div class="tl-meta">吳芳峻診所</div>
-              <div class="tl-tags"><span class="tl-tag type-診">看診</span></div>
-              <div class="tl-expand">最後一次問診，治療結束。</div>
-            </div>
-          </div>
-          <div class="tl-item" onclick="expandTL(this)">
-            <div class="tl-left">2021/3/15</div>
-            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
-            <div class="tl-content">
-              <div class="tl-title">骨科硬脊膜外注射（部立新營）</div>
-              <div class="tl-meta">部立新營 林慶美醫師</div>
-              <div class="tl-tags"><span class="tl-tag type-診">看診</span></div>
-              <div class="tl-expand">第1次，打完回來非常痠痛，因此取消後續四次神經阻斷術。</div>
-            </div>
-          </div>
-          <div class="tl-item" onclick="expandTL(this)">
-            <div class="tl-left">2020/11/26</div>
-            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
-            <div class="tl-content">
-              <div class="tl-title">風濕免疫科初診抽血報告（成大）</div>
-              <div class="tl-meta">成大 翁孟玉醫師</div>
-              <div class="tl-tags"><span class="tl-tag type-檢">檢查結果</span></div>
-              <div class="tl-expand">症狀：左膝蓋外後側/手指關節對稱疼痛。抽6管血＋X光。RF、CRP、ESR等均正常範圍。開立Celebrex 200mg消炎止痛。</div>
-            </div>
-          </div>
-          <div class="tl-item" onclick="expandTL(this)">
+
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2022/6/22</div>
             <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
               <div class="tl-title">身心科初診（春霖診所）</div>
-              <div class="tl-meta">春霖診所 蘇春霖醫師</div>
+              <div class="tl-meta">蘇春霖醫師 · 自律神經失調</div>
               <div class="tl-tags"><span class="tl-tag type-診">看診</span></div>
               <div class="tl-expand">症狀：自律神經失調。開立：NICAMET(50)、TAEE(5)、SINLIHAUL(20)、THIAMINE 100（早晚各一）。</div>
             </div>
           </div>
+
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
+            <div class="tl-left">2021/3/15</div>
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-content">
+              <div class="tl-title">骨科硬脊膜外注射（部立新營）</div>
+              <div class="tl-meta">林慶美醫師</div>
+              <div class="tl-tags"><span class="tl-tag type-診">看診</span></div>
+              <div class="tl-expand">第1次，打完回來非常痠痛，因此取消後續四次神經阻斷術。</div>
+            </div>
+          </div>
+
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
+            <div class="tl-left">2020/11/26</div>
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+            <div class="tl-content">
+              <div class="tl-title">風濕免疫科初診（成大）</div>
+              <div class="tl-meta">翁孟玉醫師 · 左膝蓋/手指關節疼痛</div>
+              <div class="tl-tags"><span class="tl-tag type-檢">檢查結果</span></div>
+              <div class="tl-expand">抽6管血＋X光。RF、CRP、ESR等均正常範圍。開立Celebrex 200mg消炎止痛。</div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
-  </div>
+  </div><!-- /page-mom -->
 
-  <!-- ═══════════════════════════════════════ 大姐 ═══ -->
+
+  <!-- ════════════════════════════════════════
+       PAGE: 大姐（M03）
+  ════════════════════════════════════════ -->
   <div class="page" id="page-sister1">
     <div class="page-header">
       <div class="page-avatar">👩</div>
@@ -1095,27 +1188,45 @@
       </div>
     </div>
     <div class="section">
-      <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-header" onclick="App.section.toggle(this)">
         📋 事件紀錄 <span class="section-toggle">▲</span>
       </div>
       <div class="section-body">
         <div class="timeline">
-          <div class="tl-item" onclick="expandTL(this)">
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2023/10/16</div>
             <div class="tl-line"><div class="tl-dot alert"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
               <div class="tl-title">奇美家庭健康檢查</div>
-              <div class="tl-meta">奇美醫院</div>
-              <div class="tl-tags"><span class="tl-tag type-檢">檢查結果</span><span class="tl-tag badge-red">結果待補</span></div>
-              <div class="tl-expand">方案：愛肺25000＋腦部核磁共振（含顯影）15000＋頸動脈超音波3000＋頸部超音波（含甲狀腺及頸部淋巴結）900＋大腸鏡含麻醉7250。結果尚未記錄，請補充。</div>
+              <div class="tl-meta">方案：愛肺25000＋腦部MRI＋頸動脈超音波＋大腸鏡含麻醉</div>
+              <div class="tl-tags"><span class="tl-tag type-檢">檢查結果</span><span class="tl-tag type-追">結果待補</span></div>
+              <div class="tl-expand">項目：愛肺25000、腦部核磁共振（含顯影）15000、頸動脈超音波3000、頸部超音波（含甲狀腺及頸部淋巴結）900、大腸鏡含麻醉7250。結果尚未記錄，請補充。</div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </div><!-- /page-sister1 -->
 
-  <!-- ═══════════════════════════════════════ YV ═══ -->
+
+  <!-- ════════════════════════════════════════
+       PAGE: 二姐（M04）
+  ════════════════════════════════════════ -->
+  <div class="page" id="page-sister2">
+    <div class="page-header">
+      <div class="page-avatar">👩</div>
+      <div>
+        <div class="page-title">二姐</div>
+        <div class="page-meta">M04</div>
+      </div>
+    </div>
+    <div class="empty">目前無任何醫療資料</div>
+  </div><!-- /page-sister2 -->
+
+
+  <!-- ════════════════════════════════════════
+       PAGE: YV（M05）
+  ════════════════════════════════════════ -->
   <div class="page" id="page-yv">
     <div class="page-header">
       <div class="page-avatar">👩</div>
@@ -1125,22 +1236,24 @@
       </div>
     </div>
     <div class="section">
-      <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-header" onclick="App.section.toggle(this)">
         📋 事件紀錄 <span class="section-toggle">▲</span>
       </div>
       <div class="section-body">
         <div class="timeline">
-          <div class="tl-item" onclick="expandTL(this)">
+
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2023/10/16</div>
             <div class="tl-line"><div class="tl-dot alert"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
               <div class="tl-title">奇美家庭健康檢查（舒心順頸）</div>
-              <div class="tl-meta">奇美醫院</div>
-              <div class="tl-tags"><span class="tl-tag type-檢">檢查結果</span><span class="tl-tag badge-red">結果待補</span></div>
+              <div class="tl-meta">方案：舒心順頸 22500</div>
+              <div class="tl-tags"><span class="tl-tag type-檢">檢查結果</span><span class="tl-tag type-追">結果待補</span></div>
               <div class="tl-expand">方案：舒心順頸 22500。結果尚未記錄，請補充。</div>
             </div>
           </div>
-          <div class="tl-item" onclick="expandTL(this)">
+
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2023/7/20</div>
             <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
@@ -1150,7 +1263,8 @@
               <div class="tl-expand">右眼近視450度散光75、左眼近視475度散光125。</div>
             </div>
           </div>
-          <div class="tl-item" onclick="expandTL(this)">
+
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2023/5/17</div>
             <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
@@ -1160,7 +1274,8 @@
               <div class="tl-expand">取卵共14顆，三管分裝（6+6+2）。</div>
             </div>
           </div>
-          <div class="tl-item" onclick="expandTL(this)">
+
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2022/6/18</div>
             <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
@@ -1170,17 +1285,19 @@
               <div class="tl-expand">2022/6/18 確認懷孕。胚胎發育至5周後，2022/8/6進行人工流產。</div>
             </div>
           </div>
-          <div class="tl-item" onclick="expandTL(this)">
+
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">約2022/6</div>
             <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
               <div class="tl-title">陰道超音波（安安婦幼）</div>
-              <div class="tl-meta">安安婦幼中心</div>
+              <div class="tl-meta">安安婦幼中心 · 日期待確認</div>
               <div class="tl-tags"><span class="tl-tag type-檢">檢查結果</span></div>
               <div class="tl-expand">生育力檢測系列之一。日期尚不確定，待補充結果。</div>
             </div>
           </div>
-          <div class="tl-item" onclick="expandTL(this)">
+
+          <div class="tl-item" onclick="App.timeline.toggle(this)">
             <div class="tl-left">2022/6/1</div>
             <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
             <div class="tl-content">
@@ -1190,19 +1307,16 @@
               <div class="tl-expand">項目：陰道超音波、輸卵管攝影、子宮內視鏡、血液檢查。AMH 2.51 ng/mL、TSH 1.99（正常）、FSH 5.81、LH 3.78、Prolactin 12.92（正常）、E2 17。Chlamydia IgA 陰性。</div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
-  </div>
+  </div><!-- /page-yv -->
 
-  <!-- ═══════════════════════════════════════ 二姐、草菇、餔幾（隱藏）═══ -->
-  <div class="page" id="page-sister2">
-    <div class="page-header">
-      <div class="page-avatar">👩</div>
-      <div><div class="page-title">二姐</div><div class="page-meta">M04</div></div>
-    </div>
-    <div class="empty">目前無任何醫療資料</div>
-  </div>
+
+  <!-- ════════════════════════════════════════
+       PAGE: 草菇（M06）— 管理員才可見
+  ════════════════════════════════════════ -->
   <div class="page" id="page-grass">
     <div class="page-header">
       <div class="page-avatar">🐾</div>
@@ -1210,6 +1324,10 @@
     </div>
     <div class="empty">目前無任何資料</div>
   </div>
+
+  <!-- ════════════════════════════════════════
+       PAGE: 餔幾（M07）— 管理員才可見
+  ════════════════════════════════════════ -->
   <div class="page" id="page-boji">
     <div class="page-header">
       <div class="page-avatar">🐾</div>
@@ -1220,111 +1338,168 @@
 
 </div><!-- /main -->
 
-<!-- Modal -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="modalTitle"></div>
-      <div class="modal-close" onclick="closeModal()">×</div>
-    </div>
-    <div class="modal-body" id="modalBody"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     管理員登入 Modal
+══════════════════════════════════════════════════════ -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-box">
+    <div class="auth-icon">🔑</div>
+    <div class="auth-title">管理員登入</div>
+    <div class="auth-sub">請輸入管理員密碼</div>
+    <input class="auth-input" id="authInput" type="password" maxlength="6" placeholder="••••"
+           onkeydown="if(event.key==='Enter') App.auth.tryLogin()">
+    <button class="auth-btn" onclick="App.auth.tryLogin()">確認</button>
+    <div class="auth-error" id="authError">密碼錯誤，請再試一次</div>
+    <div class="auth-cancel" onclick="App.auth.hideModal()">取消</div>
   </div>
 </div>
 
+
+<!-- ══════════════════════════════════════════════════════
+     JAVASCRIPT
+     架構：App 物件，各功能分模組
+
+     App.auth        ── 管理員認證（登入 Modal）
+     App.nav         ── 分頁切換
+     App.section     ── Section 折疊 / 舊用藥展開
+     App.timeline    ── 時間軸事件展開
+     App.visibility  ── 隱藏成員可見性控制
+
+     修改管理員密碼：更改 CONFIG.ADMIN_PASSWORD
+══════════════════════════════════════════════════════ -->
 <script>
-// ── Auth ──
-const ADMIN_PWD = '4982';
-let isAdmin = false;
+/* ── 設定區 ── */
+const CONFIG = {
+  ADMIN_PASSWORD: '4982',
+  DEFAULT_PAGE:   'dashboard',
+};
 
-function tryAuth() {
-  const val = document.getElementById('authInput').value;
-  if (val === ADMIN_PWD) {
-    isAdmin = true;
-    document.getElementById('authOverlay').classList.remove('open');
-    document.getElementById('adminBadge').style.display = 'inline';
-    document.getElementById('adminBtn').style.display = 'none';
-    document.getElementById('adminPanel').style.display = 'block';
-  } else {
-    document.getElementById('authError').style.display = 'block';
-    document.getElementById('authInput').value = '';
-  }
-}
+/* ── App 主物件 ── */
+const App = {
 
-function skipAuth() {
-  document.getElementById('authOverlay').classList.remove('open');
-}
+  /* ────────────────────────────────
+     auth：管理員認證
+  ──────────────────────────────── */
+  auth: {
+    isAdmin: false,
 
-function showAuth() {
-  document.getElementById('authOverlay').classList.add('open');
-  document.getElementById('authInput').focus();
-}
+    showModal() {
+      document.getElementById('authOverlay').classList.add('open');
+      document.getElementById('authInput').value = '';
+      document.getElementById('authError').style.display = 'none';
+      setTimeout(() => document.getElementById('authInput').focus(), 100);
+    },
 
-document.getElementById('authInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') tryAuth();
-});
+    hideModal() {
+      document.getElementById('authOverlay').classList.remove('open');
+    },
 
-// ── Navigation ──
-let currentPage = 'dashboard';
+    tryLogin() {
+      const val = document.getElementById('authInput').value;
+      if (val === CONFIG.ADMIN_PASSWORD) {
+        this.isAdmin = true;
+        this.hideModal();
+        document.getElementById('adminBadge').style.display = 'inline';
+        document.getElementById('adminBtn').style.display   = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+      } else {
+        document.getElementById('authError').style.display = 'block';
+        document.getElementById('authInput').value = '';
+        document.getElementById('authInput').focus();
+      }
+    },
+  },
 
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  const tabs = document.querySelectorAll('.nav-tab');
-  const map = {dashboard:0, dad:1, mom:2, sister1:3, yv:4, sister2:5, grass:6, boji:7};
-  if (map[id] !== undefined) tabs[map[id]]?.classList.add('active');
-  currentPage = id;
-  window.scrollTo(0, 0);
-}
+  /* ────────────────────────────────
+     nav：分頁切換
+     go(pageId)：切換到指定頁
+  ──────────────────────────────── */
+  nav: {
+    current: CONFIG.DEFAULT_PAGE,
 
-// ── Section Toggle ──
-function toggleSection(header) {
-  const body = header.nextElementSibling;
-  const toggle = header.querySelector('.section-toggle');
-  if (body.classList.contains('collapsed')) {
-    body.classList.remove('collapsed');
-    toggle.textContent = '▲';
-  } else {
-    body.classList.add('collapsed');
-    toggle.textContent = '▼';
-  }
-}
+    go(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      const target = document.getElementById('page-' + pageId);
+      if (target) target.classList.add('active');
 
-// ── Timeline expand ──
-function expandTL(item) {
-  item.classList.toggle('expanded');
-}
+      document.querySelectorAll('.nav-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.page === pageId);
+      });
 
-// ── Stopped meds toggle ──
-function toggleStoppedMeds(el) {
-  const cont = document.getElementById('stopped-meds-mom');
-  if (cont.style.display === 'none') {
-    cont.style.display = 'block';
-    el.textContent = '▲ 隱藏舊用藥';
-  } else {
-    cont.style.display = 'none';
-    el.textContent = '▼ 查看舊用藥（已停藥 / 舊版名稱）';
-  }
-}
+      this.current = pageId;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
 
-// ── Visibility ──
-function toggleVisibility(member, show) {
-  document.querySelectorAll(`.member-hidden[data-member="${member}"]`).forEach(el => {
-    el.style.display = show ? '' : 'none';
-  });
-}
+    init() {
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.addEventListener('click', () => App.nav.go(tab.dataset.page));
+      });
+    },
+  },
 
-// ── Modal ──
-function openModal(title, body) {
-  document.getElementById('modalTitle').textContent = title;
-  document.getElementById('modalBody').innerHTML = body;
-  document.getElementById('modalOverlay').classList.add('open');
-}
-function closeModal(e) {
-  if (!e || e.target === document.getElementById('modalOverlay')) {
-    document.getElementById('modalOverlay').classList.remove('open');
-  }
-}
+  /* ────────────────────────────────
+     section：Section 折疊 / 舊用藥展開
+  ──────────────────────────────── */
+  section: {
+    /* 折疊 Section（點擊 section-header 時呼叫） */
+    toggle(header) {
+      const body   = header.nextElementSibling;
+      const toggle = header.querySelector('.section-toggle');
+      const isOpen = !body.classList.contains('collapsed');
+      body.classList.toggle('collapsed', isOpen);
+      toggle.textContent = isOpen ? '▼' : '▲';
+    },
+
+    /* 展開舊用藥（點擊 stopped-toggle 時呼叫） */
+    toggleStopped(el) {
+      const body   = el.nextElementSibling;
+      const isOpen = body.style.display !== 'none';
+      body.style.display  = isOpen ? 'none' : 'block';
+      el.textContent = isOpen ? '▼ 查看舊用藥（已停藥）' : '▲ 隱藏舊用藥';
+    },
+  },
+
+  /* ────────────────────────────────
+     timeline：時間軸事件展開
+  ──────────────────────────────── */
+  timeline: {
+    toggle(item) {
+      item.classList.toggle('expanded');
+    },
+  },
+
+  /* ────────────────────────────────
+     visibility：隱藏成員顯示控制
+     toggle(member, show)：member 為 data-member 值
+  ──────────────────────────────── */
+  visibility: {
+    toggle(member, show) {
+      /* Nav tab */
+      document.querySelectorAll(`.nav-tab[data-member="${member}"]`).forEach(el => {
+        el.style.display = show ? '' : 'none';
+      });
+      /* 總覽成員卡片 */
+      document.querySelectorAll(`.member-card[data-member="${member}"]`).forEach(el => {
+        el.style.display = show ? '' : 'none';
+      });
+      /* 若目前正在隱藏頁，切回總覽 */
+      if (!show && App.nav.current === member) {
+        App.nav.go('dashboard');
+      }
+    },
+  },
+
+  /* ────────────────────────────────
+     init：啟動
+  ──────────────────────────────── */
+  init() {
+    this.nav.init();
+  },
+};
+
+App.init();
 </script>
+
 </body>
 </html>
